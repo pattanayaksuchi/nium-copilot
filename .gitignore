@@ -1,0 +1,10 @@
+backend/data/Nium_Validation_Fields.xlsx
+backend/build/
+frontend/.next/
+frontend/node_modules/
+.env
+backend/.env
+frontend/.env.local
+.venv/
+__pycache__/
+.DS_Store
