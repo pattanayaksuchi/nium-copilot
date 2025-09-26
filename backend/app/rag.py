@@ -28,7 +28,7 @@ except ImportError:  # pragma: no cover
     BM25Okapi = None  # type: ignore
 
 try:
-    from sentence_transformers import SentenceTransformer
+    from sentence_transformers import SentenceTransformer  # type: ignore
 except ImportError:  # pragma: no cover
     SentenceTransformer = None  # type: ignore
 

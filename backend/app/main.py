@@ -59,16 +59,34 @@ def chat(payload: schemas.ChatReq) -> schemas.ChatResp:
         or schema_lookup.answer_proxy_query(payload.message)
     )
     if schema_answer:
+        citations = [
+            schemas.Citation(
+                title=cit.get("title", ""),
+                url=cit.get("url", ""),
+                snippet=cit.get("snippet", "")
+            )
+            for cit in schema_answer.get("citations", [])
+        ]
         return schemas.ChatResp(
             answer=schema_answer["answer"],
-            citations=schema_answer["citations"],
+            citations=citations,
         )
 
     chunks = rag.hybrid_search(payload.message, k=30)
     answer = rag.synthesize_answer(payload.message, chunks)
     if not answer:
         raise HTTPException(status_code=500, detail="Unable to generate answer.")
-    citations = answer.get("citations", [])
+    citations = []
+    citations_data = answer.get("citations", [])
+    if isinstance(citations_data, list):
+        citations = [
+            schemas.Citation(
+                title=cit.get("title", "") if isinstance(cit, dict) else "",
+                url=cit.get("url", "") if isinstance(cit, dict) else "",
+                snippet=cit.get("snippet", "") if isinstance(cit, dict) else ""
+            )
+            for cit in citations_data
+        ]
     return schemas.ChatResp(answer=str(answer.get("answer", "")), citations=citations)
 
 
