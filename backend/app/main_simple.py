@@ -19,6 +19,23 @@ app.add_middleware(
 )
 
 
+@app.get("/")
+def root() -> Dict[str, Any]:
+    """Root endpoint providing API information."""
+    return {
+        "title": "Nium Developer Copilot API",
+        "version": "0.1.0", 
+        "status": "running",
+        "endpoints": {
+            "health": "/health",
+            "search": "/search", 
+            "chat": "/chat",
+            "validate": "/validate"
+        },
+        "message": "Backend is running successfully. Frontend will be available once configured."
+    }
+
+
 @app.get("/health")
 def health() -> Dict[str, bool]:
     return {"ok": True}
