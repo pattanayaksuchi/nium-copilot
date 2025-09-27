@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nium Copilot Embed</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        }
+        
+        .nium-copilot-embed {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            z-index: 2147483647; /* Maximum z-index */
+            pointer-events: none;
+        }
+        
+        .nium-copilot-iframe {
+            width: 100vw;
+            height: 100vh;
+            border: none;
+            background: transparent;
+            pointer-events: auto;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .nium-copilot-iframe {
+                width: 100vw;
+                height: 100vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="nium-copilot-embed">
+        <iframe 
+            id="nium-copilot-iframe"
+            class="nium-copilot-iframe"
+            src=""
+            allow="clipboard-write"
+            title="Nium Developer Copilot"
+        ></iframe>
+    </div>
+
+    <script>
+        (function() {
+            // Configuration
+            const WIDGET_URL = window.NIUM_COPILOT_URL || 'http://localhost:5000/widget';
+            
+            // Set iframe source
+            const iframe = document.getElementById('nium-copilot-iframe');
+            iframe.src = WIDGET_URL;
+            
+            // Handle iframe messages for responsive behavior
+            window.addEventListener('message', function(event) {
+                if (event.origin !== new URL(WIDGET_URL).origin) return;
+                
+                if (event.data.type === 'nium-copilot-resize') {
+                    const { width, height } = event.data;
+                    iframe.style.width = width + 'px';
+                    iframe.style.height = height + 'px';
+                }
+                
+                if (event.data.type === 'nium-copilot-position') {
+                    const { bottom, right } = event.data;
+                    iframe.style.bottom = bottom + 'px';
+                    iframe.style.right = right + 'px';
+                }
+            });
+            
+            // Send ready message to parent
+            function sendReady() {
+                if (iframe.contentWindow) {
+                    iframe.contentWindow.postMessage({
+                        type: 'nium-copilot-ready',
+                        host: window.location.hostname
+                    }, '*');
+                }
+            }
+            
+            iframe.addEventListener('load', sendReady);
+        })();
+    </script>
+</body>
+</html>
