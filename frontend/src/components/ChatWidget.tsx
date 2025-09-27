@@ -16,10 +16,9 @@ export function ChatWidget() {
   const { selectedConversationId } = useConversationStore();
 
   useEffect(() => {
-    // Show widget immediately and auto-expand for testing
+    // Show widget immediately and expand to compact mode for testing
     setIsVisible(true);
-    // Auto-expand to compact mode for better UX
-    setTimeout(() => setWidgetState('compact'), 500);
+    setWidgetState('compact'); // Show compact immediately for testing
   }, []);
 
   // PostMessage communication with parent page
