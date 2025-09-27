@@ -2,12 +2,12 @@
 
 import { ConversationSidebar } from '../src/components/ConversationSidebar';
 import { ChatInterface } from '../src/components/ChatInterface';
+import { AppShell } from '../src/components/AppShell';
 
 export default function ConversationApp() {
   return (
-    <div className="h-screen flex bg-gray-100">
-      <ConversationSidebar />
+    <AppShell sidebar={<ConversationSidebar />}>
       <ChatInterface />
-    </div>
+    </AppShell>
   );
 }

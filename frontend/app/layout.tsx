@@ -1,6 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { QueryProvider } from '../src/components/QueryProvider';
+import { ToastProvider } from '../src/components/ToastProvider';
 
 export const metadata: Metadata = {
   title: 'Nium Developer Copilot',
@@ -9,10 +10,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body>
+    <html lang="en" className="h-full">
+      <body className="h-full bg-subtle antialiased">
         <QueryProvider>
-          {children}
+          <ToastProvider>
+            {children}
+          </ToastProvider>
         </QueryProvider>
       </body>
     </html>
