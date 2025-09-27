@@ -32,13 +32,22 @@ export function ChatInterface({ isCompact = false }: ChatInterfaceProps = {}) {
   }, [conversation?.messages]);
 
   const handleSend = async () => {
-    if (!selectedConversationId || !composerText.trim() || sendMessage.isPending) return;
+    if (!composerText.trim() || sendMessage.isPending) return;
     
     try {
-      await sendMessage.mutateAsync({
-        conversationId: selectedConversationId,
-        content: composerText.trim()
-      });
+      // If no conversation selected, we'll need to create one via the message endpoint
+      if (!selectedConversationId) {
+        // For now, we'll send to a default conversation ID or let the backend handle it
+        await sendMessage.mutateAsync({
+          conversationId: 'new', // Backend should handle creating new conversation
+          content: composerText.trim()
+        });
+      } else {
+        await sendMessage.mutateAsync({
+          conversationId: selectedConversationId,
+          content: composerText.trim()
+        });
+      }
       resetComposer();
     } catch (error) {
       console.error('Failed to send message:', error);
@@ -86,54 +95,89 @@ export function ChatInterface({ isCompact = false }: ChatInterfaceProps = {}) {
 
   if (!selectedConversationId) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-subtle">
-        <div className={`text-center mx-auto ${isCompact ? 'max-w-xs p-4' : 'max-w-lg p-8'}`}>
-          <div className={`mx-auto mb-4 rounded-2xl bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 flex items-center justify-center shadow-custom-lg ${
-            isCompact ? 'w-12 h-12' : 'w-20 h-20 mb-6'
-          }`}>
-            <Bot className={`text-white ${isCompact ? 'w-6 h-6' : 'w-10 h-10'}`} />
-          </div>
-          <h3 className={`font-bold text-gray-900 mb-3 ${isCompact ? 'text-lg' : 'text-2xl'}`}>
-            {isCompact ? 'Nium Copilot' : 'Welcome to Nium Developer Copilot'}
-          </h3>
-          <p className={`text-muted leading-relaxed ${isCompact ? 'text-sm mb-4' : 'mb-8'}`}>
-            {isCompact 
-              ? 'Ask me about payout integration, validation, or API guidance.'
-              : 'Your AI-powered assistant for payout integration. Start a new conversation to get instant playbooks, validation guardrails, and docs-aware guidance.'
-            }
-          </p>
-          {!isCompact && (
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="bg-surface p-4 rounded-lg border border-subtle">
-                <div className="w-8 h-8 mx-auto mb-2 rounded-lg bg-blue-100 flex items-center justify-center">
-                  <span className="text-blue-600 font-semibold">✓</span>
-                </div>
-                <p className="font-medium text-gray-900 mb-1">Instant Playbooks</p>
-                <p className="text-muted text-xs">Ready-to-use integration guides</p>
-              </div>
-              <div className="bg-surface p-4 rounded-lg border border-subtle">
-                <div className="w-8 h-8 mx-auto mb-2 rounded-lg bg-green-100 flex items-center justify-center">
-                  <span className="text-green-600 font-semibold">✓</span>
-                </div>
-                <p className="font-medium text-gray-900 mb-1">Validation Guardrails</p>
-                <p className="text-muted text-xs">Real-time payload validation</p>
-              </div>
-              <div className="bg-surface p-4 rounded-lg border border-subtle">
-                <div className="w-8 h-8 mx-auto mb-2 rounded-lg bg-purple-100 flex items-center justify-center">
-                  <span className="text-purple-600 font-semibold">✓</span>
-                </div>
-                <p className="font-medium text-gray-900 mb-1">Dynamic Examples</p>
-                <p className="text-muted text-xs">Context-aware code samples</p>
-              </div>
-              <div className="bg-surface p-4 rounded-lg border border-subtle">
-                <div className="w-8 h-8 mx-auto mb-2 rounded-lg bg-indigo-100 flex items-center justify-center">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                </div>
-                <p className="font-medium text-gray-900 mb-1">Docs-Aware Chat</p>
-                <p className="text-muted text-xs">Powered by official documentation</p>
-              </div>
+      <div className="chat-interface">
+        <div className={`chat-welcome ${isCompact ? 'chat-welcome-compact' : ''}`}>
+          <div className="chat-welcome-content">
+            <div className={`chat-bot-icon ${isCompact ? 'chat-bot-icon-compact' : ''}`}>
+              <Bot size={isCompact ? 20 : 28} color="white" />
             </div>
-          )}
+            <h3 className={`chat-welcome-title ${isCompact ? 'chat-welcome-title-compact' : ''}`}>
+              {isCompact ? 'Nium Copilot' : 'Welcome to Nium Developer Copilot'}
+            </h3>
+            <p className={`chat-welcome-description ${isCompact ? 'chat-welcome-description-compact' : ''}`}>
+              {isCompact 
+                ? 'Ask me about payout integration, validation, or API guidance.'
+                : 'Your AI-powered assistant for payout integration. Get instant playbooks, validation guardrails, and docs-aware guidance.'
+              }
+            </p>
+            
+            {/* Quick Suggestions */}
+            <div className="chat-suggestions">
+              <button 
+                className="chat-suggestion-btn"
+                onClick={() => setComposerText('How do I validate a payout payload for Australia?')}
+              >
+                💸 Validate payout payload for Australia
+              </button>
+              <button 
+                className="chat-suggestion-btn"
+                onClick={() => setComposerText('Show me API integration examples for USD transfers')}
+              >
+                🔗 API integration examples for USD
+              </button>
+              <button 
+                className="chat-suggestion-btn"
+                onClick={() => setComposerText('What are the required fields for Singapore payouts?')}
+              >
+                📋 Required fields for Singapore payouts
+              </button>
+              {!isCompact && (
+                <button 
+                  className="chat-suggestion-btn"
+                  onClick={() => setComposerText('Generate a cURL example for bank transfer to UK')}
+                >
+                  🛠️ Generate cURL example for UK bank transfer
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+        
+        {/* Always show composer even without conversation */}
+        <div className={`chat-composer ${isCompact ? 'chat-composer-compact' : ''}`}>
+          <div className={isCompact ? '' : 'chat-composer-container'}>
+            <div className={`chat-input-group ${isCompact ? 'chat-input-group-compact' : ''}`}>
+              <textarea
+                ref={textareaRef}
+                value={composerText}
+                onChange={(e) => {
+                  setComposerText(e.target.value);
+                  // Auto-resize
+                  if (textareaRef.current) {
+                    textareaRef.current.style.height = 'auto';
+                    textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, isCompact ? 80 : 120) + 'px';
+                  }
+                }}
+                onKeyDown={handleKeyDown}
+                placeholder={isCompact ? "Ask about payouts..." : "Ask about payout methods, validation requirements, API integration..."}
+                className={`chat-input ${isCompact ? 'chat-input-compact' : ''}`}
+                rows={1}
+              />
+              <button
+                onClick={handleSend}
+                disabled={!composerText.trim() || sendMessage.isPending}
+                className={`chat-send-btn ${isCompact ? 'chat-send-btn-compact' : ''}`}
+              >
+                <Send size={isCompact ? 16 : 20} />
+              </button>
+            </div>
+            {!isCompact && (
+              <div className="chat-help-text">
+                <span>Press Enter to send, Shift+Enter for new line</span>
+                <span>Powered by Nium AI</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
