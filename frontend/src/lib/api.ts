@@ -3,12 +3,16 @@ import { v4 as uuidv4 } from 'uuid';
 
 // Configure API base URL for different environments
 const getApiBaseUrl = () => {
-  // Always use localhost:8000 for now to debug
+  if (typeof window !== 'undefined') {
+    // Use the current domain but port 8000 for backend
+    const hostname = window.location.hostname;
+    const protocol = window.location.protocol;
+    return `${protocol}//${hostname}:8000`;
+  }
   return 'http://localhost:8000';
 };
 
 const API_BASE_URL = getApiBaseUrl();
-console.log('=== CONFIGURED API_BASE_URL ===', API_BASE_URL);
 
 // Types matching backend schemas
 export interface Message {
@@ -69,7 +73,6 @@ function getClientId(): string {
       clientId = uuidv4();
       localStorage.setItem('nium-client-id', clientId);
     }
-    console.log('Using client ID:', clientId);
     return clientId;
   } catch (error) {
     console.warn('localStorage not accessible, using fallback client ID:', error);
@@ -92,8 +95,6 @@ class ApiClient {
     const url = `${this.baseUrl}${endpoint}`;
     const clientId = getClientId();
 
-    console.log('Making request to:', url, 'with client ID:', clientId);
-    console.log('API_BASE_URL:', this.baseUrl);
 
     const response = await fetch(url, {
       ...options,

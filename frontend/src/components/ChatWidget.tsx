@@ -16,7 +16,10 @@ const ALLOWED_ORIGINS = [
   'http://localhost:5000',
   'http://127.0.0.1:5000',
   'http://127.0.0.1:3000',
-  // Add production domains here
+  // Add Replit development domains
+  ...(typeof window !== 'undefined' && window.location.hostname.includes('replit.dev') 
+    ? [`${window.location.protocol}//${window.location.hostname}`] 
+    : []),
 ];
 
 export function ChatWidget() {
@@ -26,9 +29,10 @@ export function ChatWidget() {
   const { selectedConversationId } = useConversationStore();
 
   useEffect(() => {
-    // Show widget immediately and expand to compact for testing
+    // Show widget immediately in minimized state
     setIsVisible(true);
-    setWidgetState('compact'); // Auto-expand for testing so user can see input box
+    // Start minimized so user can click to expand
+    setWidgetState('minimized');
   }, []);
 
   // PostMessage communication with parent page - SECURE VERSION
@@ -84,12 +88,7 @@ export function ChatWidget() {
   useEffect(() => {
     const sendMessage = (data: any) => {
       if (window.parent && window.parent !== window) {
-        const allowedOrigins = [
-          'https://docs.nium.com',
-          'http://localhost:3000',
-          'http://localhost:5000'
-        ];
-        const targetOrigin = hostConfig?.origin || (allowedOrigins.includes(window.location.origin) ? window.location.origin : allowedOrigins[0]);
+        const targetOrigin = hostConfig?.origin || (ALLOWED_ORIGINS.includes(window.location.origin) ? window.location.origin : ALLOWED_ORIGINS[0]);
         window.parent.postMessage(data, targetOrigin);
       }
     };
