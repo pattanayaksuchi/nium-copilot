@@ -26,9 +26,9 @@ export function ChatWidget() {
   const { selectedConversationId } = useConversationStore();
 
   useEffect(() => {
-    // Show widget immediately but start minimized
+    // Show widget immediately and expand to compact for testing
     setIsVisible(true);
-    // Widget starts minimized by default for production use
+    setWidgetState('compact'); // Auto-expand for testing so user can see input box
   }, []);
 
   // PostMessage communication with parent page - SECURE VERSION
