@@ -16,9 +16,8 @@ export function ChatWidget() {
   const { selectedConversationId } = useConversationStore();
 
   useEffect(() => {
-    // Show widget after a brief delay for smooth entrance
-    const timer = setTimeout(() => setIsVisible(true), 1000);
-    return () => clearTimeout(timer);
+    // Show widget immediately for testing
+    setIsVisible(true);
   }, []);
 
   // PostMessage communication with parent page
@@ -114,18 +113,18 @@ export function ChatWidget() {
       {/* Overlay backdrop for maximized state */}
       {widgetState === 'maximized' && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300"
+          className="widget-overlay"
           onClick={() => handleStateChange('compact')}
         />
       )}
 
       {/* Chat Widget */}
-      <div className={`transition-all duration-300 ease-out ${
+      <div className={`widget-container ${
         widgetState === 'minimized' 
-          ? 'w-14 h-14'
+          ? 'widget-minimized'
           : widgetState === 'compact'
-          ? 'w-96 h-[500px]'
-          : 'w-full h-full'
+          ? 'widget-compact'
+          : 'widget-maximized'
       }`}>
         {widgetState === 'minimized' ? (
           <MinimizedWidget onClick={() => handleStateChange('compact')} />
@@ -149,12 +148,23 @@ function MinimizedWidget({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center group transform hover:scale-110"
+      className="widget-button"
+      style={{ position: 'relative' }}
     >
-      <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
+      <MessageCircle size={24} />
       
       {/* Pulsing indicator for new features */}
-      <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
+      <div style={{
+        position: 'absolute',
+        top: '-4px',
+        right: '-4px',
+        width: '16px',
+        height: '16px',
+        backgroundColor: '#10b981',
+        borderRadius: '50%',
+        border: '2px solid white',
+        animation: 'pulse 2s infinite'
+      }}></div>
     </button>
   );
 }
@@ -167,38 +177,46 @@ function CompactWidget({
   onMaximize: () => void;
 }) {
   return (
-    <div className="bg-surface border border-subtle rounded-2xl shadow-custom-lg overflow-hidden h-full flex flex-col animate-in slide-in-from-bottom-4 duration-300">
+    <div className="widget-content">
       {/* Compact Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
-            <Bot className="w-4 h-4" />
+      <div className="widget-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '8px',
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <Bot size={16} />
           </div>
           <div>
-            <h3 className="font-semibold text-sm">Nium Copilot</h3>
-            <p className="text-xs text-blue-100">AI Assistant</p>
+            <h3 className="widget-title">Nium Copilot</h3>
+            <p style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.8)' }}>AI Assistant</p>
           </div>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="widget-controls">
           <button
             onClick={onMaximize}
-            className="p-1.5 hover:bg-white/20 rounded-md transition-colors"
+            className="widget-control-btn"
             title="Expand"
           >
-            <Maximize2 className="w-4 h-4" />
+            <Maximize2 size={16} />
           </button>
           <button
             onClick={onMinimize}
-            className="p-1.5 hover:bg-white/20 rounded-md transition-colors"
+            className="widget-control-btn"
             title="Minimize"
           >
-            <Minimize2 className="w-4 h-4" />
+            <Minimize2 size={16} />
           </button>
         </div>
       </div>
 
       {/* Compact Chat Interface */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="widget-body">
         <ChatInterface isCompact={true} />
       </div>
     </div>
@@ -213,42 +231,96 @@ function MaximizedWidget({
   onClose: () => void;
 }) {
   return (
-    <div className="bg-surface border border-subtle rounded-2xl shadow-2xl overflow-hidden h-full animate-in slide-in-from-bottom-8 zoom-in-95 duration-300">
+    <div style={{
+      background: 'white',
+      borderRadius: '16px',
+      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+      overflow: 'hidden',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column'
+    }}>
       {/* Maximized Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-            <Bot className="w-5 h-5" />
+      <div style={{
+        background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+        color: 'white',
+        padding: '16px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            borderRadius: '12px',
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <Bot size={20} />
           </div>
           <div>
-            <h2 className="text-lg font-semibold">Nium Developer Copilot</h2>
-            <p className="text-sm text-blue-100">AI-powered assistant for payout integration</p>
+            <h2 style={{ fontSize: '18px', fontWeight: '600', margin: 0 }}>Nium Developer Copilot</h2>
+            <p style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.8)', margin: 0 }}>
+              AI-powered assistant for payout integration
+            </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <button
             onClick={onMinimize}
-            className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+            style={{
+              padding: '8px',
+              background: 'rgba(255, 255, 255, 0.2)',
+              border: 'none',
+              color: 'white',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s ease'
+            }}
             title="Minimize to compact"
+            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'}
           >
-            <Minimize2 className="w-5 h-5" />
+            <Minimize2 size={20} />
           </button>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+            style={{
+              padding: '8px',
+              background: 'rgba(255, 255, 255, 0.2)',
+              border: 'none',
+              color: 'white',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s ease'
+            }}
             title="Close"
+            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'}
           >
-            <X className="w-5 h-5" />
+            <X size={20} />
           </button>
         </div>
       </div>
 
       {/* Full App Shell */}
-      <div className="flex-1 flex overflow-hidden">
-        <div className="w-80 border-r border-subtle">
+      <div style={{ 
+        flex: 1, 
+        display: 'flex', 
+        overflow: 'hidden' 
+      }}>
+        <div style={{ 
+          width: '320px', 
+          borderRight: '1px solid #e5e7eb' 
+        }}>
           <ConversationSidebar />
         </div>
-        <div className="flex-1">
+        <div style={{ 
+          flex: 1 
+        }}>
           <ChatInterface />
         </div>
       </div>
