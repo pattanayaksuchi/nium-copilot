@@ -9,6 +9,16 @@ import { useConversationStore } from '../store/conversationStore';
 
 type WidgetState = 'minimized' | 'compact' | 'maximized';
 
+// Centralized allowed origins for security
+const ALLOWED_ORIGINS = [
+  'https://docs.nium.com',
+  'http://localhost:3000',
+  'http://localhost:5000',
+  'http://127.0.0.1:5000',
+  'http://127.0.0.1:3000',
+  // Add production domains here
+];
+
 export function ChatWidget() {
   const [widgetState, setWidgetState] = useState<WidgetState>('minimized');
   const [isVisible, setIsVisible] = useState(false);
@@ -23,18 +33,10 @@ export function ChatWidget() {
 
   // PostMessage communication with parent page - SECURE VERSION
   useEffect(() => {
-    // Get allowed origins from environment or config
-    const allowedOrigins = [
-      'https://docs.nium.com',
-      'http://localhost:3000',
-      'http://localhost:5000',
-      // Add production domains here
-    ];
-    
     const sendMessage = (data: any) => {
       if (window.parent && window.parent !== window) {
         // Use specific target origin if available from hostConfig
-        const targetOrigin = hostConfig?.origin || (allowedOrigins.includes(window.location.origin) ? window.location.origin : allowedOrigins[0]);
+        const targetOrigin = hostConfig?.origin || (ALLOWED_ORIGINS.includes(window.location.origin) ? window.location.origin : ALLOWED_ORIGINS[0]);
         window.parent.postMessage(data, targetOrigin);
       }
     };
@@ -42,7 +44,7 @@ export function ChatWidget() {
     // Listen for messages from parent
     const handleMessage = (event: MessageEvent) => {
       // Validate event origin for security
-      if (!allowedOrigins.includes(event.origin)) {
+      if (!ALLOWED_ORIGINS.includes(event.origin)) {
         console.warn('Blocked message from unauthorized origin:', event.origin);
         return;
       }
@@ -65,7 +67,7 @@ export function ChatWidget() {
     const readyTimer = setTimeout(() => {
       const sendSecureMessage = (data: any) => {
         if (window.parent && window.parent !== window) {
-          const targetOrigin = allowedOrigins.includes(window.location.origin) ? window.location.origin : allowedOrigins[0];
+          const targetOrigin = ALLOWED_ORIGINS.includes(window.location.origin) ? window.location.origin : ALLOWED_ORIGINS[0];
           window.parent.postMessage(data, targetOrigin);
         }
       };
@@ -128,12 +130,7 @@ export function ChatWidget() {
     // Send analytics for user interactions
     const sendMessage = (data: any) => {
       if (window.parent && window.parent !== window) {
-        const allowedOrigins = [
-          'https://docs.nium.com',
-          'http://localhost:3000',
-          'http://localhost:5000'
-        ];
-        const targetOrigin = hostConfig?.origin || (allowedOrigins.includes(window.location.origin) ? window.location.origin : allowedOrigins[0]);
+        const targetOrigin = hostConfig?.origin || (ALLOWED_ORIGINS.includes(window.location.origin) ? window.location.origin : ALLOWED_ORIGINS[0]);
         window.parent.postMessage(data, targetOrigin);
       }
     };
