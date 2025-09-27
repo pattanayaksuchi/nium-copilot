@@ -27,6 +27,44 @@ def _startup() -> None:
     settings.ensure_directories()
 
 
+@app.get("/")
+def root() -> Dict[str, Any]:
+    """Root endpoint providing API information and status."""
+    return {
+        "title": "Nium Developer Copilot API",
+        "version": "0.1.0", 
+        "status": "running",
+        "description": "AI-powered assistant for Nium integration teams",
+        "features": [
+            "Instant payout playbooks",
+            "Validation guardrails", 
+            "Dynamic examples",
+            "Docs-aware chat functionality"
+        ],
+        "endpoints": {
+            "health": "/health",
+            "search": "POST /search", 
+            "chat": "POST /chat",
+            "validate": "POST /validate",
+            "docs": "/docs"
+        },
+        "usage": {
+            "search": {
+                "method": "POST",
+                "url": "/search",
+                "body": {"q": "search query", "k": 5},
+                "description": "Search documentation using hybrid retrieval"
+            },
+            "chat": {
+                "method": "POST", 
+                "url": "/chat",
+                "body": {"message": "your question"},
+                "description": "Get AI-powered answers with citations"
+            }
+        }
+    }
+
+
 @app.get("/health")
 def health() -> Dict[str, bool]:
     return {"ok": True}
