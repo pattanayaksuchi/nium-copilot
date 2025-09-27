@@ -185,17 +185,46 @@ export function ChatInterface({ isCompact = false }: ChatInterfaceProps = {}) {
 
   if (isLoading) {
     return (
-      <div className="flex-1 flex flex-col bg-surface">
-        <div className="px-6 py-4 border-b border-subtle bg-surface">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 skeleton rounded-full"></div>
-            <div className="space-y-1">
-              <div className="skeleton h-4 w-32 rounded"></div>
-              <div className="skeleton h-3 w-24 rounded"></div>
+      <div className="chat-interface">
+        <div style={{
+          padding: '16px 24px',
+          borderBottom: '1px solid #e5e7eb',
+          background: 'white'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              background: '#f3f4f6',
+              animation: 'pulse 1.5s ease-in-out infinite'
+            }}></div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <div style={{
+                height: '16px',
+                width: '128px',
+                borderRadius: '4px',
+                background: '#f3f4f6',
+                animation: 'pulse 1.5s ease-in-out infinite'
+              }}></div>
+              <div style={{
+                height: '12px',
+                width: '96px',
+                borderRadius: '4px',
+                background: '#f3f4f6',
+                animation: 'pulse 1.5s ease-in-out infinite'
+              }}></div>
             </div>
           </div>
         </div>
-        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
+        <div style={{
+          flex: 1,
+          overflowY: 'auto',
+          padding: '24px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '24px'
+        }}>
           <MessageSkeleton />
           <MessageSkeleton />
           <MessageSkeleton />
@@ -205,22 +234,53 @@ export function ChatInterface({ isCompact = false }: ChatInterfaceProps = {}) {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-surface">
+    <div className="chat-interface">
       {/* Header - Hide in compact mode */}
       {!isCompact && (
-        <div className="px-6 py-4 border-b border-subtle bg-surface shadow-sm">
-          <div className="flex items-center justify-between">
+        <div style={{
+          padding: '16px 24px',
+          borderBottom: '1px solid #e5e7eb',
+          background: 'white',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
-              <h1 className="text-xl font-semibold text-gray-900">
+              <h1 style={{
+                fontSize: '20px',
+                fontWeight: '600',
+                color: '#111827',
+                margin: 0
+              }}>
                 {conversation?.title || 'New Chat'}
               </h1>
-              <p className="text-sm text-muted mt-1">
+              <p style={{
+                fontSize: '14px',
+                color: '#6b7280',
+                margin: '4px 0 0 0'
+              }}>
                 AI-powered assistant for Nium integration teams
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1.5 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-medium rounded-full border border-green-200">
-                <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '4px 10px',
+                background: '#f0fdf4',
+                color: '#166534',
+                fontSize: '12px',
+                fontWeight: '500',
+                borderRadius: '9999px',
+                border: '1px solid #bbf7d0'
+              }}>
+                <div style={{
+                  width: '6px',
+                  height: '6px',
+                  background: '#10b981',
+                  borderRadius: '50%',
+                  animation: 'pulse 2s infinite'
+                }}></div>
                 Online
               </div>
             </div>
@@ -229,8 +289,8 @@ export function ChatInterface({ isCompact = false }: ChatInterfaceProps = {}) {
       )}
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin bg-gradient-to-b from-transparent to-blue-50/30">
-        <div className={`mx-auto space-y-4 ${isCompact ? 'px-3 py-3 max-w-none' : 'max-w-4xl px-6 py-6 space-y-6'}`}>
+      <div className="chat-messages">
+        <div className={`chat-messages-container ${isCompact ? 'chat-messages-container-compact' : ''}`}>
           {conversation?.messages?.map((message) => (
             <MessageBubble 
               key={message.id} 
@@ -244,20 +304,18 @@ export function ChatInterface({ isCompact = false }: ChatInterfaceProps = {}) {
           ))}
           
           {sendMessage.isPending && (
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-sm">
-                <Bot className="w-5 h-5 text-white" />
+            <div className="message-bubble">
+              <div className="message-avatar message-avatar-assistant">
+                <Bot size={20} color="white" />
               </div>
-              <div className="flex-1">
-                <div className="bubble-assistant max-w-xs px-4 py-3 rounded-2xl">
-                  <div className="flex items-center gap-3">
-                    <div className="flex gap-1">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
-                    </div>
-                    <span className="text-sm text-muted">Thinking...</span>
+              <div style={{ flex: 1 }}>
+                <div className="typing-indicator">
+                  <div className="typing-dots">
+                    <div className="typing-dot"></div>
+                    <div className="typing-dot"></div>
+                    <div className="typing-dot"></div>
                   </div>
+                  <span style={{ fontSize: '14px', color: '#6b7280' }}>Thinking...</span>
                 </div>
               </div>
             </div>
@@ -268,10 +326,10 @@ export function ChatInterface({ isCompact = false }: ChatInterfaceProps = {}) {
       </div>
 
       {/* Message Composer */}
-      <div className="border-t border-subtle bg-surface shadow-sm" style={{ padding: isCompact ? '12px' : '16px' }}>
-        <div className={isCompact ? '' : 'max-w-4xl mx-auto'}>
-          <div className={`flex items-end ${isCompact ? 'gap-2' : 'gap-3'}`}>
-            <div className="flex-1 relative">
+      <div className={`chat-composer ${isCompact ? 'chat-composer-compact' : ''}`}>
+        <div className={isCompact ? '' : 'chat-composer-container'}>
+          <div className={`chat-input-group ${isCompact ? 'chat-input-group-compact' : ''}`}>
+            <div style={{ flex: 1, position: 'relative' }}>
               <textarea
                 ref={textareaRef}
                 value={composerText}
@@ -285,17 +343,17 @@ export function ChatInterface({ isCompact = false }: ChatInterfaceProps = {}) {
                 }}
                 onKeyDown={handleKeyDown}
                 placeholder={isCompact ? "Ask about payouts..." : "Ask about payout methods, validation requirements, API integration..."}
-                className={`w-full bg-surface border border-subtle rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none transition-custom placeholder-text-subtle ${
-                  isCompact ? 'px-3 py-2 pr-8 text-sm' : 'px-4 py-3 pr-12'
-                }`}
+                className={`chat-input ${isCompact ? 'chat-input-compact' : ''}`}
                 rows={1}
-                style={{
-                  minHeight: isCompact ? '36px' : '48px',
-                  maxHeight: isCompact ? '80px' : '120px'
-                }}
               />
               {!isCompact && composerText.length > 0 && (
-                <div className="absolute bottom-2 right-2 text-xs text-subtle">
+                <div style={{
+                  position: 'absolute',
+                  bottom: '8px',
+                  right: '8px',
+                  fontSize: '12px',
+                  color: '#6b7280'
+                }}>
                   <span>{composerText.length}/2000</span>
                 </div>
               )}
@@ -303,15 +361,13 @@ export function ChatInterface({ isCompact = false }: ChatInterfaceProps = {}) {
             <button
               onClick={handleSend}
               disabled={!composerText.trim() || sendMessage.isPending}
-              className={`bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105 ${
-                isCompact ? 'p-2' : 'p-3'
-              }`}
+              className={`chat-send-btn ${isCompact ? 'chat-send-btn-compact' : ''}`}
             >
-              <Send className={isCompact ? 'w-4 h-4' : 'w-5 h-5'} />
+              <Send size={isCompact ? 16 : 20} />
             </button>
           </div>
           {!isCompact && (
-            <div className="flex items-center justify-between mt-2 text-xs text-subtle">
+            <div className="chat-help-text">
               <span>Press Enter to send, Shift+Enter for new line</span>
               <span>Powered by Nium AI</span>
             </div>
@@ -337,59 +393,86 @@ function MessageBubble({ message, onCopy, copiedMessageId, isHovered, onHover, o
 
   return (
     <div 
-      className={`flex items-start gap-4 group ${isUser ? 'flex-row-reverse' : ''}`}
+      className={`message-bubble ${isUser ? 'message-bubble-user' : ''}`}
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
+      style={{ position: 'relative' }}
     >
-      <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm ${
-        isUser 
-          ? 'bg-gradient-to-br from-gray-600 to-gray-700' 
-          : 'bg-gradient-to-br from-blue-500 to-indigo-600'
-      }`}>
+      <div className={`message-avatar ${isUser ? 'message-avatar-user' : 'message-avatar-assistant'}`}>
         {isUser ? (
-          <User className="w-5 h-5 text-white" />
+          <User size={20} color="white" />
         ) : (
-          <Bot className="w-5 h-5 text-white" />
+          <Bot size={20} color="white" />
         )}
       </div>
       
-      <div className={`flex-1 min-w-0 max-w-3xl ${isUser ? 'flex flex-col items-end' : ''}`}>
-        <div className={`flex items-center gap-2 mb-2 ${isUser ? 'flex-row-reverse' : ''}`}>
-          <span className="font-medium text-gray-900 text-sm">
+      <div className={`message-content ${isUser ? 'message-content-user' : ''}`}>
+        <div className={`message-header ${isUser ? 'message-header-user' : ''}`}>
+          <span className="message-name">
             {isUser ? 'You' : 'Nium Copilot'}
           </span>
-          <span className="text-xs text-muted">{timestamp}</span>
+          <span className="message-time">{timestamp}</span>
         </div>
         
-        <div className={`relative ${
-          isUser 
-            ? 'bubble-user max-w-lg ml-auto' 
-            : 'bubble-assistant max-w-4xl'
-        } px-4 py-3 rounded-2xl shadow-sm`}>
-          <div className="whitespace-pre-wrap text-gray-800 leading-relaxed text-sm">
-            {message.content}
-          </div>
+        <div className={`message-text ${isUser ? 'message-text-user' : ''}`}>
+          {message.content}
           
           {/* Hover Actions Toolbar */}
           {isHovered && (
-            <div className={`absolute top-2 ${isUser ? 'left-2' : 'right-2'} flex items-center gap-1 bg-surface border border-subtle rounded-lg px-2 py-1 shadow-custom opacity-0 group-hover:opacity-100 transition-opacity z-10`}>
+            <div style={{
+              position: 'absolute',
+              top: '8px',
+              right: isUser ? 'auto' : '8px',
+              left: isUser ? '8px' : 'auto',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              background: 'white',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              padding: '4px 8px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              opacity: isHovered ? 1 : 0,
+              transition: 'opacity 0.2s ease',
+              zIndex: 10
+            }}>
               <button
                 onClick={() => onCopy(message.content, message.id)}
-                className="p-1 text-muted hover:text-gray-700 rounded transition-custom"
+                style={{
+                  padding: '4px',
+                  color: '#6b7280',
+                  background: 'none',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  transition: 'color 0.2s ease'
+                }}
                 title="Copy message"
+                onMouseEnter={(e) => e.currentTarget.style.color = '#374151'}
+                onMouseLeave={(e) => e.currentTarget.style.color = '#6b7280'}
               >
                 {copiedMessageId === message.id ? (
-                  <Check className="w-3 h-3 text-green-600" />
+                  <Check size={12} color="#10b981" />
                 ) : (
-                  <Copy className="w-3 h-3" />
+                  <Copy size={12} />
                 )}
               </button>
               {!isUser && (
                 <button
-                  className="p-1 text-muted hover:text-gray-700 rounded transition-custom"
+                  style={{
+                    padding: '4px',
+                    color: '#6b7280',
+                    background: 'none',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    transition: 'color 0.2s ease'
+                  }}
                   title="Regenerate response"
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#374151'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#6b7280'}
                 >
-                  <RotateCcw className="w-3 h-3" />
+                  <RotateCcw size={12} />
                 </button>
               )}
             </div>
@@ -398,9 +481,22 @@ function MessageBubble({ message, onCopy, copiedMessageId, isHovered, onHover, o
 
         {/* Citations */}
         {message.citations && message.citations.length > 0 && (
-          <div className={`mt-3 space-y-2 ${isUser ? 'self-end' : ''}`}>
-            <h4 className="text-xs font-medium text-muted uppercase tracking-wide">Sources</h4>
-            <div className="flex flex-wrap gap-2">
+          <div style={{
+            marginTop: '12px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
+            alignSelf: isUser ? 'flex-end' : 'flex-start'
+          }}>
+            <h4 style={{
+              fontSize: '12px',
+              fontWeight: '500',
+              color: '#6b7280',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              margin: 0
+            }}>Sources</h4>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
               {message.citations.map((citation, index) => (
                 <CitationChip key={index} citation={citation} />
               ))}
@@ -422,11 +518,39 @@ function CitationChip({ citation }: CitationCardProps) {
       href={citation.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg text-xs text-blue-700 hover:text-blue-800 transition-custom hover-lift"
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '6px',
+        padding: '6px 10px',
+        background: '#eff6ff',
+        border: '1px solid #bfdbfe',
+        borderRadius: '8px',
+        fontSize: '12px',
+        color: '#1d4ed8',
+        textDecoration: 'none',
+        fontWeight: '500',
+        transition: 'all 0.2s ease',
+        maxWidth: '128px'
+      }}
       title={citation.snippet}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = '#dbeafe';
+        e.currentTarget.style.color = '#1e40af';
+        e.currentTarget.style.transform = 'translateY(-1px)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = '#eff6ff';
+        e.currentTarget.style.color = '#1d4ed8';
+        e.currentTarget.style.transform = 'translateY(0)';
+      }}
     >
-      <ExternalLink className="w-3 h-3" />
-      <span className="font-medium truncate max-w-32">{citation.title}</span>
+      <ExternalLink size={12} />
+      <span style={{ 
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap'
+      }}>{citation.title}</span>
     </a>
   );
 }

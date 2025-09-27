@@ -16,23 +16,46 @@ export function ChatWidget() {
   const { selectedConversationId } = useConversationStore();
 
   useEffect(() => {
-    // Show widget immediately and expand to compact mode for testing
+    // Show widget immediately but start minimized
     setIsVisible(true);
-    setWidgetState('compact'); // Show compact immediately for testing
+    // Widget starts minimized by default for production use
   }, []);
 
-  // PostMessage communication with parent page
+  // PostMessage communication with parent page - SECURE VERSION
   useEffect(() => {
+    // Get allowed origins from environment or config
+    const allowedOrigins = [
+      'https://docs.nium.com',
+      'http://localhost:3000',
+      'http://localhost:5000',
+      // Add production domains here
+    ];
+    
     const sendMessage = (data: any) => {
       if (window.parent && window.parent !== window) {
-        window.parent.postMessage(data, '*');
+        // Use specific target origin if available from hostConfig
+        const targetOrigin = hostConfig?.origin || (allowedOrigins.includes(window.location.origin) ? window.location.origin : allowedOrigins[0]);
+        window.parent.postMessage(data, targetOrigin);
       }
     };
 
     // Listen for messages from parent
     const handleMessage = (event: MessageEvent) => {
-      if (event.data.type === 'nium-copilot-config') {
-        setHostConfig(event.data.config);
+      // Validate event origin for security
+      if (!allowedOrigins.includes(event.origin)) {
+        console.warn('Blocked message from unauthorized origin:', event.origin);
+        return;
+      }
+
+      // Sanitize and validate message data
+      if (event.data && typeof event.data === 'object' && event.data.type === 'nium-copilot-config') {
+        // Validate config structure before setting
+        if (event.data.config && typeof event.data.config === 'object') {
+          setHostConfig({
+            ...event.data.config,
+            origin: event.origin // Store validated origin
+          });
+        }
       }
     };
 
@@ -40,20 +63,32 @@ export function ChatWidget() {
 
     // Send ready message to parent after a brief delay
     const readyTimer = setTimeout(() => {
-      sendMessage({ type: 'nium-copilot-ready' });
+      const sendSecureMessage = (data: any) => {
+        if (window.parent && window.parent !== window) {
+          const targetOrigin = allowedOrigins.includes(window.location.origin) ? window.location.origin : allowedOrigins[0];
+          window.parent.postMessage(data, targetOrigin);
+        }
+      };
+      sendSecureMessage({ type: 'nium-copilot-ready' });
     }, 500);
 
     return () => {
       window.removeEventListener('message', handleMessage);
       clearTimeout(readyTimer);
     };
-  }, []);
+  }, [hostConfig]);
 
   // Send resize messages when state changes
   useEffect(() => {
     const sendMessage = (data: any) => {
       if (window.parent && window.parent !== window) {
-        window.parent.postMessage(data, '*');
+        const allowedOrigins = [
+          'https://docs.nium.com',
+          'http://localhost:3000',
+          'http://localhost:5000'
+        ];
+        const targetOrigin = hostConfig?.origin || (allowedOrigins.includes(window.location.origin) ? window.location.origin : allowedOrigins[0]);
+        window.parent.postMessage(data, targetOrigin);
       }
     };
 
@@ -93,7 +128,13 @@ export function ChatWidget() {
     // Send analytics for user interactions
     const sendMessage = (data: any) => {
       if (window.parent && window.parent !== window) {
-        window.parent.postMessage(data, '*');
+        const allowedOrigins = [
+          'https://docs.nium.com',
+          'http://localhost:3000',
+          'http://localhost:5000'
+        ];
+        const targetOrigin = hostConfig?.origin || (allowedOrigins.includes(window.location.origin) ? window.location.origin : allowedOrigins[0]);
+        window.parent.postMessage(data, targetOrigin);
       }
     };
     
