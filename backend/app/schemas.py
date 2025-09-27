@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import uuid
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
@@ -45,10 +47,79 @@ class ChatResp(BaseModel):
     citations: List[Citation]
 
 
+# Conversation-related schemas
+class Message(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    role: str  # 'user' or 'assistant'
+    content: str
+    citations: List[Citation] = []
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class ConversationSummary(BaseModel):
+    id: str
+    title: str
+    created_at: datetime
+    updated_at: datetime
+    messages_count: int
+
+
+class Conversation(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    messages: List[Message] = []
+    summary: Optional[str] = None
+
+    @property
+    def messages_count(self) -> int:
+        return len(self.messages)
+
+    def to_summary(self) -> ConversationSummary:
+        return ConversationSummary(
+            id=self.id,
+            title=self.title,
+            created_at=self.created_at,
+            updated_at=self.updated_at,
+            messages_count=self.messages_count
+        )
+
+
+class CreateConversationReq(BaseModel):
+    title: Optional[str] = None
+
+
+class CreateConversationResp(BaseModel):
+    id: str
+    title: str
+
+
+class UpdateConversationReq(BaseModel):
+    title: str
+
+
+class SendMessageReq(BaseModel):
+    content: str
+
+
+class SendMessageResp(BaseModel):
+    user_message: Message
+    assistant_message: Message
+
+
 __all__ = [
     "ChatReq",
-    "SearchReq",
+    "SearchReq", 
     "ValidateReq",
     "Citation",
     "ChatResp",
+    "Message",
+    "Conversation",
+    "ConversationSummary",
+    "CreateConversationReq",
+    "CreateConversationResp",
+    "UpdateConversationReq",
+    "SendMessageReq",
+    "SendMessageResp",
 ]
