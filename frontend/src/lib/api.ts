@@ -1,7 +1,19 @@
 // API client for conversation management
 import { v4 as uuidv4 } from 'uuid';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+// Configure API base URL for different environments
+const getApiBaseUrl = () => {
+  // Check if we're in Replit environment
+  if (typeof window !== 'undefined' && window.location.hostname.includes('replit.dev')) {
+    // In Replit, use the same hostname but with port 8000
+    return `${window.location.protocol}//${window.location.hostname.replace(/:\d+/, '')}:8000`;
+  }
+  
+  // Use environment variable or localhost fallback
+  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 // Types matching backend schemas
 export interface Message {
@@ -86,6 +98,7 @@ class ApiClient {
     const clientId = getClientId();
 
     console.log('Making request to:', url, 'with client ID:', clientId);
+    console.log('API_BASE_URL:', this.baseUrl);
 
     const response = await fetch(url, {
       ...options,
