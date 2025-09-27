@@ -565,6 +565,9 @@ body {
   flex: 1;
   min-width: 0;
   max-width: 600px;
+  /* Ensure content doesn't interfere with controls */
+  position: relative;
+  z-index: 1;
 }
 
 .message-content-user {
@@ -605,6 +608,41 @@ body {
   line-height: 1.6;
   white-space: pre-wrap;
   font-size: 14px;
+  /* Handle long content properly */
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  /* Limit height for very long messages */
+  max-height: 400px;
+  overflow-y: auto;
+  /* Ensure proper scrolling */
+  min-height: 0;
+}
+
+/* Custom scrollbar for message text */
+.message-text::-webkit-scrollbar {
+  width: 6px;
+}
+
+.message-text::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+}
+
+.message-text::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.5);
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+
+.message-text::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.8);
+}
+
+/* For Firefox */
+.message-text {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.5) rgba(0, 0, 0, 0.05);
 }
 
 .message-text-user {
@@ -613,6 +651,19 @@ body {
   border: none;
   margin-left: auto;
   max-width: 400px;
+  /* Override scrollbar colors for dark background */
+}
+
+.message-text-user::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.message-text-user::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.message-text-user::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .typing-indicator {
