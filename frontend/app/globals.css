@@ -199,6 +199,7 @@ body {
 
 .widget-container {
   transition: all 0.3s ease-out;
+  position: relative;
 }
 
 .widget-minimized {
@@ -214,6 +215,8 @@ body {
 .widget-maximized {
   width: 100%;
   height: 100%;
+  position: relative;
+  z-index: 50;
 }
 
 .widget-button {
