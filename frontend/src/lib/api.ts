@@ -56,12 +56,18 @@ export interface SendMessageResponse {
 function getClientId(): string {
   if (typeof window === 'undefined') return 'ssr-client';
   
-  let clientId = localStorage.getItem('nium-client-id');
-  if (!clientId) {
-    clientId = uuidv4();
-    localStorage.setItem('nium-client-id', clientId);
+  try {
+    let clientId = localStorage.getItem('nium-client-id');
+    if (!clientId) {
+      clientId = uuidv4();
+      localStorage.setItem('nium-client-id', clientId);
+    }
+    console.log('Using client ID:', clientId);
+    return clientId;
+  } catch (error) {
+    console.warn('localStorage not accessible, using fallback client ID:', error);
+    return `fallback-${uuidv4()}`;
   }
-  return clientId;
 }
 
 // API client class
@@ -79,6 +85,8 @@ class ApiClient {
     const url = `${this.baseUrl}${endpoint}`;
     const clientId = getClientId();
 
+    console.log('Making request to:', url, 'with client ID:', clientId);
+
     const response = await fetch(url, {
       ...options,
       headers: {
@@ -88,8 +96,11 @@ class ApiClient {
       },
     });
 
+    console.log('Response status:', response.status);
+
     if (!response.ok) {
       const error = await response.text();
+      console.error('API Error:', response.status, error);
       throw new Error(`API Error: ${response.status} - ${error}`);
     }
 
