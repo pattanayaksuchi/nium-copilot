@@ -9,17 +9,17 @@ export default function DocsPage() {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#fff' }}>
       {/* Header */}
-      <header className="header">
+      <div className="header">
         <div className="container">
-          <div className="flex items-center justify-between">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
             {/* Logo and Navigation */}
-            <div className="flex items-center space-x-8">
-              <div className="flex items-center space-x-4">
-                <span className="text-2xl font-bold text-blue-600">NIUM</span>
-                <span className="text-sm font-semibold text-gray-600">Docs</span>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="nium-logo">NIUM</span>
+                <span className="docs-label">Docs</span>
               </div>
               
-              <nav className="hidden md:flex space-x-6">
+              <nav className="nav-links">
                 <a href="#" className="nav-link">Guides</a>
                 <a href="#" className="nav-link">API Reference</a>
                 <a href="#" className="nav-link">Changelog</a>
@@ -27,8 +27,8 @@ export default function DocsPage() {
             </div>
 
             {/* Search and Theme Toggle */}
-            <div className="flex items-center space-x-4">
-              <div className="search-container">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div className="search-box">
                 <div className="search-icon">
                   <Search size={16} />
                 </div>
@@ -37,123 +37,124 @@ export default function DocsPage() {
                   placeholder="Search"
                   className="search-input"
                 />
-                <div style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)' }}>
-                  <kbd style={{ 
-                    display: 'inline-flex', 
-                    alignItems: 'center', 
-                    border: '1px solid #e5e7eb', 
-                    borderRadius: '4px', 
-                    padding: '2px 6px', 
-                    fontSize: '12px', 
-                    color: '#6b7280',
-                    fontFamily: 'monospace'
-                  }}>
-                    ⌘K
-                  </kbd>
+                <div style={{ 
+                  position: 'absolute', 
+                  right: '12px', 
+                  top: '50%', 
+                  transform: 'translateY(-50%)',
+                  fontSize: '12px',
+                  color: '#6b7280',
+                  fontFamily: 'monospace',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '4px',
+                  padding: '2px 6px'
+                }}>
+                  ⌘K
                 </div>
               </div>
               
               <button
                 onClick={() => setDarkMode(!darkMode)}
-                className="theme-toggle"
+                style={{ 
+                  padding: '8px', 
+                  background: 'none', 
+                  border: 'none', 
+                  color: '#6b7280', 
+                  cursor: 'pointer',
+                  borderRadius: '4px'
+                }}
               >
                 {darkMode ? <Sun size={20} /> : <Moon size={20} />}
               </button>
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Main Content */}
-      <main className="container py-12">
+      <main className="container" style={{ paddingTop: '48px', paddingBottom: '48px' }}>
         {/* Hero Section */}
-        <div className="text-center mb-16">
-          <h1 className="text-5xl font-bold mb-6">
-            <span className="text-blue-500">Move Money Globally</span>{" "}
-            <span className="text-gray-900">with Nium</span>
+        <div className="hero-section">
+          <h1 className="hero-title">
+            <span className="hero-blue">Move Money Globally</span>{" "}
+            <span style={{ color: '#111827' }}>with Nium</span>
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="hero-subtitle">
             Documentation for our previous version of payins and payouts (also called Masspay) can be found{" "}
-            <a href="#" style={{ color: '#2563eb', textDecoration: 'underline' }}>here</a>
+            <a href="#" className="blue-link">here</a>
           </p>
         </div>
 
         {/* Getting Started Cards */}
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
+        <div className="cards-grid">
           <div className="card">
-            <h3 className="text-xl font-semibold text-gray-900 mb-6">Getting Started</h3>
-            <p className="text-gray-600 text-sm">
+            <h3 className="card-title">Getting Started</h3>
+            <p className="card-text">
               Learn key concepts and how to get start building your integration
             </p>
           </div>
           
           <div className="card">
-            <h3 className="text-xl font-semibold text-gray-900 mb-6">API Reference</h3>
-            <p className="text-gray-600 text-sm">
+            <h3 className="card-title">API Reference</h3>
+            <p className="card-text">
               Go from idea to implementation quickly with the Nium API
             </p>
           </div>
           
           <div className="card">
-            <h3 className="text-xl font-semibold text-gray-900 mb-6">Changelog</h3>
-            <p className="text-gray-600 text-sm">
+            <h3 className="card-title">Changelog</h3>
+            <p className="card-text">
               A record of all changes, including bug fixes, enhancements, and new features
             </p>
           </div>
         </div>
 
         {/* Use Cases Section */}
-        <div className="mb-16">
-          <div className="mb-8">
-            <h2 className="text-sm font-semibold text-blue-500 uppercase tracking-wide mb-2">
-              USECASE
-            </h2>
-            <h3 className="text-3xl font-bold text-gray-900">
-              Real world solutions
-            </h3>
+        <div style={{ marginBottom: '64px' }}>
+          <div style={{ marginBottom: '32px' }}>
+            <h2 className="section-title">USECASE</h2>
+            <h3 className="section-heading">Real world solutions</h3>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
-            <div className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
-              <h4 className="text-lg font-semibold text-gray-900 mb-3">Payroll</h4>
-              <p className="text-gray-600 text-sm">
+          <div className="cards-grid">
+            <div className="card">
+              <h4 className="card-title">Payroll</h4>
+              <p className="card-text">
                 Streamline payroll for contractors and employees
               </p>
             </div>
             
-            <div className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
-              <h4 className="text-lg font-semibold text-gray-900 mb-3">Spend Management</h4>
-              <p className="text-gray-600 text-sm">
+            <div className="card">
+              <h4 className="card-title">Spend Management</h4>
+              <p className="card-text">
                 Allocate and track company funds for employee business expenses
               </p>
             </div>
             
-            <div className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
-              <h4 className="text-lg font-semibold text-gray-900 mb-3">Financial Institutions</h4>
-              <p className="text-gray-600 text-sm">
+            <div className="card">
+              <h4 className="card-title">Financial Institutions</h4>
+              <p className="card-text">
                 Access financial services with in-region licensing for businesses and individuals
               </p>
             </div>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
-              <h4 className="text-lg font-semibold text-gray-900 mb-3">Travel</h4>
-              <p className="text-gray-600 text-sm">
+            
+            <div className="card">
+              <h4 className="card-title">Travel</h4>
+              <p className="card-text">
                 Simplify payments for travel agencies, airlines, and hotels
               </p>
             </div>
             
-            <div className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow opacity-50">
-              <h4 className="text-lg font-semibold text-gray-900 mb-3">More Solutions</h4>
-              <p className="text-gray-600 text-sm">
+            <div className="card" style={{ opacity: 0.5 }}>
+              <h4 className="card-title">More Solutions</h4>
+              <p className="card-text">
                 Explore additional use cases and integrations
               </p>
             </div>
             
-            <div className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow opacity-50">
-              <h4 className="text-lg font-semibold text-gray-900 mb-3">Coming Soon</h4>
-              <p className="text-gray-600 text-sm">
+            <div className="card" style={{ opacity: 0.5 }}>
+              <h4 className="card-title">Coming Soon</h4>
+              <p className="card-text">
                 New features and capabilities in development
               </p>
             </div>
@@ -161,28 +162,26 @@ export default function DocsPage() {
         </div>
 
         {/* Product Section */}
-        <div className="mb-16">
-          <h2 className="text-sm font-semibold text-blue-500 uppercase tracking-wide mb-4">
-            PRODUCT
-          </h2>
-          <div className="bg-white p-8 rounded-lg border border-gray-200">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+        <div style={{ marginBottom: '64px' }}>
+          <h2 className="section-title">PRODUCT</h2>
+          <div className="card" style={{ padding: '32px' }}>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#111827', marginBottom: '16px' }}>
               Global Infrastructure for Modern Finance
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p style={{ color: '#6b7280', marginBottom: '24px' }}>
               Build, scale, and launch financial products with Nium's comprehensive platform. 
               From embedded finance to global payouts, we provide the infrastructure you need.
             </p>
-            <div className="grid md:grid-cols-2 gap-6">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px' }}>
               <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Global Reach</h4>
-                <p className="text-sm text-gray-600">
+                <h4 style={{ fontWeight: '600', color: '#111827', marginBottom: '8px' }}>Global Reach</h4>
+                <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>
                   Process payments in 100+ countries with local settlement capabilities
                 </p>
               </div>
               <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Developer First</h4>
-                <p className="text-sm text-gray-600">
+                <h4 style={{ fontWeight: '600', color: '#111827', marginBottom: '8px' }}>Developer First</h4>
+                <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>
                   RESTful APIs, comprehensive documentation, and powerful SDKs
                 </p>
               </div>
@@ -192,11 +191,9 @@ export default function DocsPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center text-gray-600">
-            <p>&copy; 2024 Nium. All rights reserved.</p>
-          </div>
+      <footer className="footer">
+        <div className="container">
+          <p>&copy; 2024 Nium. All rights reserved.</p>
         </div>
       </footer>
 
@@ -205,12 +202,12 @@ export default function DocsPage() {
         <MessageCircle size={24} />
       </div>
 
-      {/* Chat Widget Integration Script */}
+      {/* Chat Widget Script */}
       <script
         dangerouslySetInnerHTML={{
           __html: `
-            if (typeof window !== 'undefined') {
-              setTimeout(() => {
+            setTimeout(() => {
+              if (typeof window !== 'undefined') {
                 window.NIUM_COPILOT_URL = window.location.origin + '/widget';
                 window.NIUM_COPILOT_CONFIG = {
                   position: { bottom: '24px', right: '24px' },
@@ -222,8 +219,8 @@ export default function DocsPage() {
                 script.src = '/embed-simple.js';
                 script.async = true;
                 document.head.appendChild(script);
-              }, 1000);
-            }
+              }
+            }, 1000);
           `
         }}
       />
