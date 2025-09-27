@@ -244,6 +244,8 @@ body {
   height: 100%;
   display: flex;
   flex-direction: column;
+  /* Ensure proper flex behavior for scrolling */
+  min-height: 0;
 }
 
 .widget-header {
@@ -299,6 +301,8 @@ body {
   flex-direction: column;
   height: 100%;
   background: #f8fafc;
+  /* Ensure proper flex behavior */
+  min-height: 0;
 }
 
 .chat-welcome {
@@ -389,7 +393,36 @@ body {
 .chat-messages {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   background: linear-gradient(to bottom, transparent, rgba(219, 234, 254, 0.3));
+  /* Ensure proper height calculation */
+  min-height: 0;
+  /* Custom scrollbar styling */
+}
+
+/* Custom scrollbar for chat messages */
+.chat-messages::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.5);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.8);
+}
+
+/* For Firefox */
+.chat-messages {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.5) transparent;
 }
 
 .chat-messages-container {
