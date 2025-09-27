@@ -4,10 +4,13 @@ import { v4 as uuidv4 } from 'uuid';
 // Configure API base URL for different environments
 const getApiBaseUrl = () => {
   if (typeof window !== 'undefined') {
-    // Use the current domain but port 8000 for backend
-    const hostname = window.location.hostname;
-    const protocol = window.location.protocol;
-    return `${protocol}//${hostname}:8000`;
+    // In Replit, backend is accessed through the same domain with different port
+    if (window.location.hostname.includes('replit.dev')) {
+      // Use the same origin but proxy to backend port 8000
+      return window.location.origin + '/api-proxy';
+    }
+    // For local development, use localhost with port 8000
+    return 'http://localhost:8000';
   }
   return 'http://localhost:8000';
 };
@@ -95,8 +98,6 @@ class ApiClient {
     const url = `${this.baseUrl}${endpoint}`;
     const clientId = getClientId();
 
-    console.log('🔥 API Request:', url, 'with client ID:', clientId);
-
     const response = await fetch(url, {
       ...options,
       headers: {
@@ -106,11 +107,8 @@ class ApiClient {
       },
     });
 
-    console.log('🔥 Response status:', response.status);
-
     if (!response.ok) {
       const error = await response.text();
-      console.error('🔥 API Error:', response.status, error);
       throw new Error(`API Error: ${response.status} - ${error}`);
     }
 
