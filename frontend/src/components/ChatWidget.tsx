@@ -96,7 +96,7 @@ export function ChatWidget() {
 
     const sizes = {
       minimized: { width: 56, height: 56 },
-      compact: { width: 400, height: 500 },
+      compact: { width: 400, height: 550 }, // Increased height to show input box fully
       maximized: { width: window.innerWidth - 32, height: window.innerHeight - 32 }
     };
 

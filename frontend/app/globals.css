@@ -208,7 +208,7 @@ body {
 
 .widget-compact {
   width: 400px;
-  height: 500px;
+  height: 550px;
 }
 
 .widget-maximized {
@@ -317,7 +317,7 @@ body {
 
 .chat-welcome-compact {
   max-width: 300px;
-  padding: 16px;
+  padding: 12px;
 }
 
 .chat-bot-icon {
@@ -364,8 +364,8 @@ body {
 .chat-suggestions {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 16px;
+  gap: 6px;
+  margin-top: 12px;
 }
 
 .chat-suggestion-btn {
