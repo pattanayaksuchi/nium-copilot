@@ -197,7 +197,7 @@ function MinimizedWidget({ onClick }: { onClick: () => void }) {
         justifyContent: 'center'
       }}
     >
-      <MessageCircle size={24} />
+      <MessageCircle size={28} />
       
       {/* Pulsing indicator for new features */}
       <div style={{
