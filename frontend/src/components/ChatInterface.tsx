@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, ExternalLink, Copy, Check, RotateCcw } from 'lucide-react';
-import { useConversation, useSendMessage } from '../hooks/useConversations';
+import { useConversation, useSendMessage, useCreateConversation } from '../hooks/useConversations';
 import { useConversationStore } from '../store/conversationStore';
 import { Message, Citation } from '../lib/api';
 import { MessageSkeleton } from './LoadingSkeleton';
@@ -13,9 +13,10 @@ interface ChatInterfaceProps {
 }
 
 export function ChatInterface({ isCompact = false }: ChatInterfaceProps = {}) {
-  const { selectedConversationId, composerText, setComposerText, resetComposer } = useConversationStore();
+  const { selectedConversationId, composerText, setComposerText, resetComposer, setSelectedConversationId } = useConversationStore();
   const { data: conversation, isLoading } = useConversation(selectedConversationId);
   const sendMessage = useSendMessage();
+  const createConversation = useCreateConversation();
   const { showToast } = useToast();
   
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
@@ -32,22 +33,24 @@ export function ChatInterface({ isCompact = false }: ChatInterfaceProps = {}) {
   }, [conversation?.messages]);
 
   const handleSend = async () => {
-    if (!composerText.trim() || sendMessage.isPending) return;
+    if (!composerText.trim() || sendMessage.isPending || createConversation.isPending) return;
     
     try {
-      // If no conversation selected, we'll need to create one via the message endpoint
-      if (!selectedConversationId) {
-        // For now, we'll send to a default conversation ID or let the backend handle it
-        await sendMessage.mutateAsync({
-          conversationId: 'new', // Backend should handle creating new conversation
-          content: composerText.trim()
-        });
-      } else {
-        await sendMessage.mutateAsync({
-          conversationId: selectedConversationId,
-          content: composerText.trim()
-        });
+      let conversationId = selectedConversationId;
+      
+      // If no conversation selected, create one first
+      if (!conversationId) {
+        const newConversation = await createConversation.mutateAsync('New Chat');
+        conversationId = newConversation.id;
+        setSelectedConversationId(conversationId);
       }
+      
+      // Send the message to the conversation
+      await sendMessage.mutateAsync({
+        conversationId: conversationId,
+        content: composerText.trim()
+      });
+      
       resetComposer();
     } catch (error) {
       console.error('Failed to send message:', error);
