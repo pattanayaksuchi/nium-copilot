@@ -1,16 +1,19 @@
 import './globals.css';
 import type { Metadata } from 'next';
+import { QueryProvider } from '../src/components/QueryProvider';
 
 export const metadata: Metadata = {
   title: 'Nium Developer Copilot',
-  description: 'Hybrid RAG Copilot for corridor validation and documentation lookup.',
+  description: 'AI-powered assistant for Nium integration teams',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <div className="container">{children}</div>
+        <QueryProvider>
+          {children}
+        </QueryProvider>
       </body>
     </html>
   );
