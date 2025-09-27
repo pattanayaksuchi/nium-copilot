@@ -11,16 +11,8 @@ export default function DocsLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <head>
-        <script src="/widget-config.js"></script>
-      </head>
-      <body>
-        {children}
-        
-        {/* Nium Copilot Widget Script */}
-        <script src="/embed-simple.js" async></script>
-      </body>
-    </html>
+    <>
+      {children}
+    </>
   );
 }

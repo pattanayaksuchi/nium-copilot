@@ -15,7 +15,7 @@ export default function DocsPage() {
             {/* Logo and Navigation */}
             <div className="flex items-center space-x-8">
               <div className="flex items-center space-x-2">
-                <span className="text-2xl font-bold text-gray-900 dark:text-white">NIUM</span>
+                <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">NIUM</span>
                 <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Docs</span>
               </div>
               
@@ -66,7 +66,7 @@ export default function DocsPage() {
         {/* Hero Section */}
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold mb-6">
-            <span className="text-blue-500">Move Money Globally</span>{" "}
+            <span className="bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">Move Money Globally</span>{" "}
             <span className="text-gray-900 dark:text-white">with Nium</span>
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
@@ -197,7 +197,27 @@ export default function DocsPage() {
         </div>
       </footer>
 
-      {/* Widget configuration will be handled by layout */}
+      {/* Chat Widget Integration */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            if (typeof window !== 'undefined') {
+              window.NIUM_COPILOT_URL = '${typeof window !== 'undefined' ? window.location.origin : ''}/widget';
+              window.NIUM_COPILOT_CONFIG = {
+                position: { bottom: '24px', right: '24px' },
+                hideOnMobile: false,
+                zIndex: 2147483647
+              };
+              
+              // Load embed script
+              const script = document.createElement('script');
+              script.src = '/embed-simple.js';
+              script.async = true;
+              document.head.appendChild(script);
+            }
+          `
+        }}
+      />
     </div>
   );
 }
