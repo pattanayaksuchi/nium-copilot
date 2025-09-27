@@ -15,7 +15,7 @@ export default function DocsPage() {
             {/* Logo and Navigation */}
             <div className="flex items-center space-x-8">
               <div className="flex items-center space-x-2">
-                <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">NIUM</span>
+                <span className="text-2xl font-bold text-blue-600">NIUM</span>
                 <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Docs</span>
               </div>
               
@@ -66,7 +66,7 @@ export default function DocsPage() {
         {/* Hero Section */}
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">Move Money Globally</span>{" "}
+            <span className="text-blue-500">Move Money Globally</span>{" "}
             <span className="text-gray-900 dark:text-white">with Nium</span>
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
@@ -77,21 +77,21 @@ export default function DocsPage() {
 
         {/* Getting Started Cards */}
         <div className="grid md:grid-cols-3 gap-8 mb-16">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+          <div className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Getting Started</h3>
             <p className="text-gray-600 dark:text-gray-300 text-sm">
               Learn key concepts and how to get start building your integration
             </p>
           </div>
           
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+          <div className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">API Reference</h3>
             <p className="text-gray-600 dark:text-gray-300 text-sm">
               Go from idea to implementation quickly with the Nium API
             </p>
           </div>
           
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+          <div className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Changelog</h3>
             <p className="text-gray-600 dark:text-gray-300 text-sm">
               A record of all changes, including bug fixes, enhancements, and new features
@@ -111,21 +111,21 @@ export default function DocsPage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 mb-8">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+            <div className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
               <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Payroll</h4>
               <p className="text-gray-600 dark:text-gray-300 text-sm">
                 Streamline payroll for contractors and employees
               </p>
             </div>
             
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+            <div className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
               <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Spend Management</h4>
               <p className="text-gray-600 dark:text-gray-300 text-sm">
                 Allocate and track company funds for employee business expenses
               </p>
             </div>
             
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+            <div className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
               <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Financial Institutions</h4>
               <p className="text-gray-600 dark:text-gray-300 text-sm">
                 Access financial services with in-region licensing for businesses and individuals
@@ -134,7 +134,7 @@ export default function DocsPage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+            <div className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
               <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Travel</h4>
               <p className="text-gray-600 dark:text-gray-300 text-sm">
                 Simplify payments for travel agencies, airlines, and hotels
