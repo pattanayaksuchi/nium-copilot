@@ -36,10 +36,21 @@ export function ChatInterface({ isCompact = false }: ChatInterfaceProps = {}) {
     if (!composerText.trim() || sendMessage.isPending || createConversation.isPending) return;
     
     try {
+      showToast({
+        type: 'info',
+        title: 'Sending message...',
+        message: 'Connecting to backend'
+      });
+      
       let conversationId = selectedConversationId;
       
       // If no conversation selected, create one first
       if (!conversationId) {
+        showToast({
+          type: 'info',
+          title: 'Creating conversation...',
+          message: 'Setting up new chat'
+        });
         const newConversation = await createConversation.mutateAsync('New Chat');
         conversationId = newConversation.id;
         setSelectedConversationId(conversationId);
@@ -51,13 +62,19 @@ export function ChatInterface({ isCompact = false }: ChatInterfaceProps = {}) {
         content: composerText.trim()
       });
       
+      showToast({
+        type: 'success',
+        title: 'Message sent!',
+        message: 'Response incoming'
+      });
+      
       resetComposer();
     } catch (error) {
       console.error('Failed to send message:', error);
       showToast({
         type: 'error',
         title: 'Message failed to send',
-        message: 'Please try again'
+        message: `Error: ${error instanceof Error ? error.message : 'Please try again'}`
       });
     }
   };

@@ -3,17 +3,12 @@ import { v4 as uuidv4 } from 'uuid';
 
 // Configure API base URL for different environments
 const getApiBaseUrl = () => {
-  // Check if we're in Replit environment
-  if (typeof window !== 'undefined' && window.location.hostname.includes('replit.dev')) {
-    // In Replit, use the same hostname but with port 8000
-    return `${window.location.protocol}//${window.location.hostname.replace(/:\d+/, '')}:8000`;
-  }
-  
-  // Use environment variable or localhost fallback
-  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+  // Always use localhost:8000 for now to debug
+  return 'http://localhost:8000';
 };
 
 const API_BASE_URL = getApiBaseUrl();
+console.log('=== CONFIGURED API_BASE_URL ===', API_BASE_URL);
 
 // Types matching backend schemas
 export interface Message {
