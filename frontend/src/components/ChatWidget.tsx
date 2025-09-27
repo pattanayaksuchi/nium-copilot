@@ -187,7 +187,15 @@ function MinimizedWidget({ onClick }: { onClick: () => void }) {
     <button
       onClick={onClick}
       className="widget-button"
-      style={{ position: 'relative' }}
+      style={{ 
+        position: 'relative',
+        width: '56px',
+        height: '56px',
+        borderRadius: '50%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}
     >
       <MessageCircle size={24} />
       
@@ -201,7 +209,8 @@ function MinimizedWidget({ onClick }: { onClick: () => void }) {
         backgroundColor: '#10b981',
         borderRadius: '50%',
         border: '2px solid white',
-        animation: 'pulse 2s infinite'
+        animation: 'pulse 2s infinite',
+        pointerEvents: 'none'
       }}></div>
     </button>
   );

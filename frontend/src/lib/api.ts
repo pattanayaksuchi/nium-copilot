@@ -95,6 +95,7 @@ class ApiClient {
     const url = `${this.baseUrl}${endpoint}`;
     const clientId = getClientId();
 
+    console.log('🔥 API Request:', url, 'with client ID:', clientId);
 
     const response = await fetch(url, {
       ...options,
@@ -105,11 +106,11 @@ class ApiClient {
       },
     });
 
-    console.log('Response status:', response.status);
+    console.log('🔥 Response status:', response.status);
 
     if (!response.ok) {
       const error = await response.text();
-      console.error('API Error:', response.status, error);
+      console.error('🔥 API Error:', response.status, error);
       throw new Error(`API Error: ${response.status} - ${error}`);
     }
 
