@@ -18,7 +18,7 @@ Add this script tag to your docs site before the closing `</body>` tag:
 <script>
   window.NIUM_COPILOT_URL = 'https://your-copilot-domain.com/widget';
 </script>
-<script src="https://your-copilot-domain.com/embed.js"></script>
+<script src="https://your-copilot-domain.com/embed-simple.js"></script>
 ```
 
 ### Method 2: Manual Initialization
@@ -30,7 +30,7 @@ For more control over when the widget loads:
   window.NIUM_COPILOT_AUTO_INIT = false;
   window.NIUM_COPILOT_URL = 'https://your-copilot-domain.com/widget';
 </script>
-<script src="https://your-copilot-domain.com/embed.js"></script>
+<script src="https://your-copilot-domain.com/embed-simple.js"></script>
 <script>
   // Initialize when ready
   document.addEventListener('DOMContentLoaded', function() {
@@ -41,29 +41,34 @@ For more control over when the widget loads:
 </script>
 ```
 
-### Method 3: iframe Embed
+### Method 3: iframe Embed (Not Recommended)
 
-For maximum isolation, use the iframe method:
+**Note**: Direct iframe embedding without the companion script is not recommended as it lacks proper sizing and interaction handling. Use Method 1 instead for best results.
+
+If you must use iframe-only embedding:
 
 ```html
 <div id="nium-copilot-container"></div>
 <script>
+  // WARNING: This method doesn't provide optimal user experience
   const iframe = document.createElement('iframe');
   iframe.src = 'https://your-copilot-domain.com/widget';
   iframe.style.cssText = `
     position: fixed;
-    bottom: 0;
-    right: 0;
-    width: 100vw;
-    height: 100vh;
+    bottom: 20px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
     border: none;
+    border-radius: 28px;
     z-index: 2147483647;
-    pointer-events: none;
   `;
   iframe.allow = 'clipboard-write';
   document.getElementById('nium-copilot-container').appendChild(iframe);
 </script>
 ```
+
+**Limitations**: Widget will not resize properly when expanded, and full-screen mode will not work correctly.
 
 ## Widget States & Behavior
 
@@ -87,23 +92,33 @@ For maximum isolation, use the iframe method:
 
 ## Customization Options
 
-### Positioning
+### Positioning and Mobile Behavior
 ```javascript
-// Custom positioning
+// Custom configuration (set before loading embed script)
 window.NIUM_COPILOT_CONFIG = {
   position: {
     bottom: '30px',
     right: '30px'
-  }
-};
-```
-
-### Auto-Hide on Mobile
-```javascript
-window.NIUM_COPILOT_CONFIG = {
+  },
+  zIndex: 1000000,
   hideOnMobile: true,
   mobileBreakpoint: 768
 };
+```
+
+### Complete Example with Configuration
+```html
+<script>
+  // Configuration
+  window.NIUM_COPILOT_URL = 'https://your-copilot-domain.com/widget';
+  window.NIUM_COPILOT_CONFIG = {
+    position: { bottom: '24px', right: '24px' },
+    hideOnMobile: false,
+    mobileBreakpoint: 768,
+    zIndex: 2147483647
+  };
+</script>
+<script src="https://your-copilot-domain.com/embed-simple.js"></script>
 ```
 
 ### Custom Styling
@@ -138,8 +153,12 @@ For local development:
 ```html
 <script>
   window.NIUM_COPILOT_URL = 'http://localhost:5000/widget';
+  window.NIUM_COPILOT_CONFIG = {
+    position: { bottom: '20px', right: '20px' },
+    hideOnMobile: false
+  };
 </script>
-<script src="http://localhost:5000/embed.js"></script>
+<script src="http://localhost:5000/embed-simple.js"></script>
 ```
 
 Test all three states:

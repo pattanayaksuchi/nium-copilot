@@ -56,9 +56,10 @@
                 bottom: ${CONFIG.position.bottom};
                 right: ${CONFIG.position.right};
                 z-index: ${CONFIG.zIndex};
-                pointer-events: none;
-                max-width: 100vw;
-                max-height: 100vh;
+                pointer-events: auto;
+                width: 56px;
+                height: 56px;
+                transition: all 0.3s ease;
             `;
             
             document.body.appendChild(this.container);
@@ -68,12 +69,13 @@
             this.iframe = document.createElement('iframe');
             this.iframe.src = CONFIG.widgetUrl;
             this.iframe.style.cssText = `
-                width: 100vw;
-                height: 100vh;
+                width: 56px;
+                height: 56px;
                 border: none;
                 background: transparent;
                 pointer-events: auto;
-                border-radius: 0;
+                border-radius: 28px;
+                transition: all 0.3s ease;
             `;
             this.iframe.allow = 'clipboard-write';
             this.iframe.title = 'Nium Developer Copilot';
@@ -98,7 +100,7 @@
         handleWidgetMessage(data) {
             switch (data.type) {
                 case 'nium-copilot-resize':
-                    this.handleResize(data.width, data.height);
+                    this.handleResize(data.width, data.height, data.state);
                     break;
                     
                 case 'nium-copilot-ready':
@@ -106,36 +108,27 @@
                     break;
                     
                 case 'nium-copilot-minimize':
-                    this.container.style.pointerEvents = 'none';
+                    this.handleMinimize();
                     break;
                     
                 case 'nium-copilot-expand':
-                    this.container.style.pointerEvents = 'auto';
+                    this.handleExpand(data.state);
+                    break;
+                    
+                case 'nium-copilot-analytics':
+                    this.handleAnalytics(data);
                     break;
             }
         }
         
-        handleResize(width, height) {
-            if (!this.iframe) return;
+        handleResize(width, height, state) {
+            if (!this.iframe || !this.container) return;
             
-            // Responsive behavior
             const isMobile = window.innerWidth <= 768;
             
-            if (width && height) {
-                this.iframe.style.width = width + 'px';
-                this.iframe.style.height = height + 'px';
-            } else if (isMobile) {
-                this.iframe.style.width = '100vw';
-                this.iframe.style.height = '100vh';
-                this.container.style.bottom = '0';
-                this.container.style.right = '0';
-            } else {
-                this.iframe.style.width = '100vw';
-                this.iframe.style.height = '100vh';
-                this.container.style.bottom = CONFIG.position.bottom;
-                this.container.style.right = CONFIG.position.right;
-            }
-        }
+            // Update iframe size
+            this.iframe.style.width = width + 'px';
+            this.iframe.style.height = height + 'px';\n            \n            // Update container size and position based on state\n            this.container.style.width = width + 'px';\n            this.container.style.height = height + 'px';\n            \n            if (state === 'minimized') {\n                this.container.style.bottom = CONFIG.position.bottom;\n                this.container.style.right = CONFIG.position.right;\n                this.iframe.style.borderRadius = '28px';\n            } else if (state === 'compact') {\n                this.container.style.bottom = CONFIG.position.bottom;\n                this.container.style.right = CONFIG.position.right;\n                this.iframe.style.borderRadius = '16px';\n            } else if (state === 'maximized') {\n                // Center on screen with some padding\n                this.container.style.bottom = '16px';\n                this.container.style.right = '16px';\n                this.container.style.left = '16px';\n                this.container.style.top = '16px';\n                this.container.style.width = 'auto';\n                this.container.style.height = 'auto';\n                this.iframe.style.width = '100%';\n                this.iframe.style.height = '100%';\n                this.iframe.style.borderRadius = '16px';\n            }\n        }\n        \n        handleMinimize() {\n            // Minimized state - ensure proper positioning\n            this.container.style.left = 'auto';\n            this.container.style.top = 'auto';\n        }\n        \n        handleExpand(state) {\n            // Expanded states - compact or maximized\n            if (state === 'maximized') {\n                // Full overlay positioning handled in handleResize\n            }\n        }\n        \n        handleAnalytics(data) {\n            // Forward analytics to parent page's analytics system\n            if (window.gtag) {\n                window.gtag('event', data.action, {\n                    'event_category': 'Nium Copilot',\n                    'event_label': data.label,\n                    'custom_parameter_1': data.timestamp\n                });\n            }\n            \n            // Also dispatch custom event for other analytics systems\n            window.dispatchEvent(new CustomEvent('nium-copilot-analytics', {\n                detail: data\n            }));\n        }
         
         sendConfig() {
             if (!this.iframe || !this.iframe.contentWindow) return;

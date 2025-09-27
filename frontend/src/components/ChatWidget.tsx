@@ -12,6 +12,7 @@ type WidgetState = 'minimized' | 'compact' | 'maximized';
 export function ChatWidget() {
   const [widgetState, setWidgetState] = useState<WidgetState>('minimized');
   const [isVisible, setIsVisible] = useState(false);
+  const [hostConfig, setHostConfig] = useState<any>(null);
   const { selectedConversationId } = useConversationStore();
 
   useEffect(() => {
@@ -20,13 +21,90 @@ export function ChatWidget() {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleStateChange = (newState: WidgetState) => {
-    if (newState === 'minimized') {
-      // Smooth close animation
-      setWidgetState('minimized');
+  // PostMessage communication with parent page
+  useEffect(() => {
+    const sendMessage = (data: any) => {
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage(data, '*');
+      }
+    };
+
+    // Listen for messages from parent
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data.type === 'nium-copilot-config') {
+        setHostConfig(event.data.config);
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+
+    // Send ready message to parent after a brief delay
+    const readyTimer = setTimeout(() => {
+      sendMessage({ type: 'nium-copilot-ready' });
+    }, 500);
+
+    return () => {
+      window.removeEventListener('message', handleMessage);
+      clearTimeout(readyTimer);
+    };
+  }, []);
+
+  // Send resize messages when state changes
+  useEffect(() => {
+    const sendMessage = (data: any) => {
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage(data, '*');
+      }
+    };
+
+    const sizes = {
+      minimized: { width: 56, height: 56 },
+      compact: { width: 400, height: 500 },
+      maximized: { width: window.innerWidth - 32, height: window.innerHeight - 32 }
+    };
+
+    const size = sizes[widgetState];
+    
+    sendMessage({
+      type: 'nium-copilot-resize',
+      state: widgetState,
+      ...size
+    });
+
+    // Send expand/minimize events
+    if (widgetState !== 'minimized') {
+      sendMessage({ type: 'nium-copilot-expand', state: widgetState });
     } else {
-      setWidgetState(newState);
+      sendMessage({ type: 'nium-copilot-minimize', state: widgetState });
     }
+
+    // Analytics events
+    sendMessage({
+      type: 'nium-copilot-analytics',
+      action: `widget_${widgetState}`,
+      label: `State changed to ${widgetState}`,
+      timestamp: Date.now()
+    });
+  }, [widgetState]);
+
+  const handleStateChange = (newState: WidgetState) => {
+    setWidgetState(newState);
+    
+    // Send analytics for user interactions
+    const sendMessage = (data: any) => {
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage(data, '*');
+      }
+    };
+    
+    sendMessage({
+      type: 'nium-copilot-analytics',
+      action: `user_interaction`,
+      label: `User changed widget to ${newState}`,
+      previousState: widgetState,
+      newState: newState,
+      timestamp: Date.now()
+    });
   };
 
   if (!isVisible) return null;
@@ -42,12 +120,12 @@ export function ChatWidget() {
       )}
 
       {/* Chat Widget */}
-      <div className={`fixed z-50 transition-all duration-300 ease-out ${
+      <div className={`transition-all duration-300 ease-out ${
         widgetState === 'minimized' 
-          ? 'bottom-6 right-6 w-14 h-14'
+          ? 'w-14 h-14'
           : widgetState === 'compact'
-          ? 'bottom-6 right-6 w-96 h-[500px]'
-          : 'inset-4 w-auto h-auto'
+          ? 'w-96 h-[500px]'
+          : 'w-full h-full'
       }`}>
         {widgetState === 'minimized' ? (
           <MinimizedWidget onClick={() => handleStateChange('compact')} />
