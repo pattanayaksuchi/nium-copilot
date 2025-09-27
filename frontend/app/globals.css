@@ -268,25 +268,42 @@ body {
 .widget-controls {
   display: flex;
   gap: 8px;
+  /* Ensure controls are visible */
+  z-index: 10;
+  position: relative;
 }
 
 .widget-control-btn {
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
-  padding: 6px;
-  border-radius: 4px;
+  padding: 8px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
+  /* Make buttons more visible and accessible */
+  min-width: 36px;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Increase visibility */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .widget-control-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.4);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .widget-body {
   flex: 1;
   background: #f8fafc;
+  /* Ensure proper scrolling container */
+  min-height: 0;
+  overflow: hidden;
 }
 
 @keyframes pulse {
@@ -304,8 +321,9 @@ body {
   flex-direction: column;
   height: 100%;
   background: #f8fafc;
-  /* Ensure proper flex behavior */
+  /* Ensure proper flex behavior and scrolling */
   min-height: 0;
+  overflow: hidden;
 }
 
 .chat-welcome {
@@ -398,9 +416,11 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
   background: linear-gradient(to bottom, transparent, rgba(219, 234, 254, 0.3));
-  /* Ensure proper height calculation */
+  /* Ensure proper height calculation and scrolling */
   min-height: 0;
-  /* Custom scrollbar styling */
+  max-height: 100%;
+  /* Force scrollbar to always appear for consistency */
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Custom scrollbar for chat messages */
@@ -448,25 +468,32 @@ body {
   background: white;
   padding: 16px;
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+  /* Ensure it stays at bottom and takes full width */
+  flex-shrink: 0;
 }
 
 .chat-composer-compact {
   padding: 12px;
+  /* Ensure proper spacing for compact mode */
 }
 
 .chat-composer-container {
-  max-width: 800px;
-  margin: 0 auto;
+  /* Remove max-width restriction for compact mode */
+  width: 100%;
 }
 
 .chat-input-group {
   display: flex;
   align-items: flex-end;
   gap: 12px;
+  /* Ensure full width usage */
+  width: 100%;
 }
 
 .chat-input-group-compact {
   gap: 8px;
+  /* Ensure compact mode also uses full width */
+  width: 100%;
 }
 
 .chat-input {

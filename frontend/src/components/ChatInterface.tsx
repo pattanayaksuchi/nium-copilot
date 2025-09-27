@@ -148,39 +148,37 @@ export function ChatInterface({ isCompact = false }: ChatInterfaceProps = {}) {
         
         {/* Always show composer even without conversation */}
         <div className={`chat-composer ${isCompact ? 'chat-composer-compact' : ''}`}>
-          <div className={isCompact ? '' : 'chat-composer-container'}>
-            <div className={`chat-input-group ${isCompact ? 'chat-input-group-compact' : ''}`}>
-              <textarea
-                ref={textareaRef}
-                value={composerText}
-                onChange={(e) => {
-                  setComposerText(e.target.value);
-                  // Auto-resize
-                  if (textareaRef.current) {
-                    textareaRef.current.style.height = 'auto';
-                    textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, isCompact ? 80 : 120) + 'px';
-                  }
-                }}
-                onKeyDown={handleKeyDown}
-                placeholder={isCompact ? "Ask about payouts..." : "Ask about payout methods, validation requirements, API integration..."}
-                className={`chat-input ${isCompact ? 'chat-input-compact' : ''}`}
-                rows={1}
-              />
-              <button
-                onClick={handleSend}
-                disabled={!composerText.trim() || sendMessage.isPending}
-                className={`chat-send-btn ${isCompact ? 'chat-send-btn-compact' : ''}`}
-              >
-                <Send size={isCompact ? 16 : 20} />
-              </button>
-            </div>
-            {!isCompact && (
-              <div className="chat-help-text">
-                <span>Press Enter to send, Shift+Enter for new line</span>
-                <span>Powered by Nium AI</span>
-              </div>
-            )}
+          <div className={`chat-input-group ${isCompact ? 'chat-input-group-compact' : ''}`}>
+            <textarea
+              ref={textareaRef}
+              value={composerText}
+              onChange={(e) => {
+                setComposerText(e.target.value);
+                // Auto-resize
+                if (textareaRef.current) {
+                  textareaRef.current.style.height = 'auto';
+                  textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, isCompact ? 80 : 120) + 'px';
+                }
+              }}
+              onKeyDown={handleKeyDown}
+              placeholder={isCompact ? "Ask about payouts..." : "Ask about payout methods, validation requirements, API integration..."}
+              className={`chat-input ${isCompact ? 'chat-input-compact' : ''}`}
+              rows={1}
+            />
+            <button
+              onClick={handleSend}
+              disabled={!composerText.trim() || sendMessage.isPending}
+              className={`chat-send-btn ${isCompact ? 'chat-send-btn-compact' : ''}`}
+            >
+              <Send size={isCompact ? 16 : 20} />
+            </button>
           </div>
+          {!isCompact && (
+            <div className="chat-help-text">
+              <span>Press Enter to send, Shift+Enter for new line</span>
+              <span>Powered by Nium AI</span>
+            </div>
+          )}
         </div>
       </div>
     );
