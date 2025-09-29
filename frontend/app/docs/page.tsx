@@ -169,7 +169,7 @@ export default function DocsPage() {
               Global Infrastructure for Modern Finance
             </h3>
             <p style={{ color: '#6b7280', marginBottom: '24px' }}>
-              Build, scale, and launch financial products with Nium's comprehensive platform. 
+              Build, scale, and launch financial products with Nium&apos;s comprehensive platform. 
               From embedded finance to global payouts, we provide the infrastructure you need.
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px' }}>

@@ -80,7 +80,7 @@ async function proxyRequest(
   } catch (error) {
     console.error('Proxy error:', error);
     return new NextResponse(
-      JSON.stringify({ error: 'Proxy error', details: error.message }),
+      JSON.stringify({ error: 'Proxy error', details: error instanceof Error ? error.message : 'Unknown error' }),
       { 
         status: 500,
         headers: { 'content-type': 'application/json' }

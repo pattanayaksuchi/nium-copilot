@@ -121,7 +121,7 @@ export function ChatWidget() {
       label: `State changed to ${widgetState}`,
       timestamp: Date.now()
     });
-  }, [widgetState]);
+  }, [widgetState, hostConfig?.origin]);
 
   const handleStateChange = (newState: WidgetState) => {
     setWidgetState(newState);
