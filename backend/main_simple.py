@@ -7,8 +7,8 @@ import uvicorn
 
 
 if __name__ == "__main__":
-    # For development: use port 8000, for production: use PORT env var (5000)
-    port = int(os.environ.get("PORT", 8000))
+    # Always use port 8000 for backend - frontend expects this
+    port = 8000
     # Set CORS origins for iframe widget support
     os.environ.setdefault("CORS_ORIGINS", "*")
     # Using 0.0.0.0 for Replit environment
