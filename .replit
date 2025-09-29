@@ -61,4 +61,4 @@ externalPort = 8000
 [deployment]
 deploymentTarget = "vm"
 build = ["bash", "-c", "cd frontend && npm install && npm run build"]
-run = ["bash", "-c", "cd backend && python main_simple.py & sleep 2 && cd ../frontend && npm start"]
+run = ["bash", "-c", "(cd backend && python main_simple.py) & sleep 2 && cd frontend && npm start"]
