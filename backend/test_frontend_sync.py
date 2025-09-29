@@ -175,7 +175,11 @@ class FrontendSyncTester:
             
             if response.status_code == 200:
                 data = response.json()
-                return data["content"], response_time_ms
+                # Handle frontend response structure: {user_message: {...}, assistant_message: {content: "..."}}
+                if "assistant_message" in data and "content" in data["assistant_message"]:
+                    return data["assistant_message"]["content"], response_time_ms
+                else:
+                    return f"ERROR: Unexpected response structure: {data}", response_time_ms
             else:
                 return f"ERROR: {response.status_code} - {response.text}", response_time_ms
     
