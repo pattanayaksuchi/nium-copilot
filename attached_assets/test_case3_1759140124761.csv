@@ -1,0 +1,51 @@
+question,expected_response,category,priority
+"What are the mandatory fields for NOK payouts to Norway?","IBAN, beneficiaryName, remitterName, amount, purposeCode (if required)",mandatory_fields,medium
+"What are the required fields for DKK payouts to Denmark?","IBAN or local account+registrationNumber, beneficiaryName, remitterName, amount",mandatory_fields,medium
+"Are beneficiary names required in local script for CNH payouts to China?","Yes, local-language name may be required per corridor rules",validation_rules,high
+"What regex applies to Hong Kong HKID?","Regex pattern: ^[A-Z]{1,2}[0-9]{6}\\([0-9A]\\)$",validation_rules,medium
+"What is the expected format for UAE IBAN?","Starts with AE + 21 digits (length 23); IBAN checksum must pass",validation_rules,medium
+"Which proxy types are supported in Indonesia?","MOBILE, NATIONAL_ID, EMAIL (if supported by rail)",proxy_values,low
+"Which proxy types are supported in the Philippines?","MOBILE, EMAIL, TIN/COMPANY_ID (if supported by proxy rail)",proxy_values,medium
+"How do I create a payout to the UK local rail?","POST /payouts with currency=GBP, country=GB, beneficiary.accountNumber + sortCode",api_usage,high
+"How do I create a USD payout via SWIFT?","POST /payouts with method=SWIFT, include beneficiary.IBAN or account + BIC, and purpose if required",api_usage,high
+"How do I pass an Idempotency-Key for create payout?","Send Idempotency-Key header with a unique value per logical request",api_usage,high
+"How do I subscribe to payout.completed webhooks?","POST /webhooks with events=[\"payout.completed\"] and your target URL",webhooks,medium
+"How do I verify webhook timestamps to prevent replay attacks?","Validate signature, ensure timestamp within allowed drift, reject replays",security,high
+"What is the retry policy for 5xx errors from payout creation?","Use exponential backoff with jitter, cap retries, respect Retry-After if present",errors,high
+"How do I use pagination when listing payouts?","Use page/limit or cursor parameters; follow next/prev tokens in response",api_usage,medium
+"How do I sort payouts by newest first?","Pass sort=createdAt&order=desc (or use documented sort fields)",api_usage,low
+"How do I filter payouts by status and currency?","GET /payouts?status=COMPLETED&currency=USD",api_usage,medium
+"How can I retrieve estimated fees or FX rates before creating a payout?","Call pricing/quote endpoint if available; otherwise consult product guide",api_usage,low
+"Explain the difference between beneficiary and remitter.","Beneficiary = receiver of funds; Remitter = sender; both may require KYC fields",conceptual,low
+"Outline the go-live checklist for new clients.","Obtain credentials, configure webhooks, test sandbox flows, validate payloads, enable production",conceptual,medium
+"Which corridors commonly require purposeCode?","USD wires, some GCC/APAC corridors; check corridor-specific rules in Validation Sheet",validation_rules,medium
+"How do fields differ for CAD local vs USD local?","CAD requires institutionNumber + transitNumber + accountNumber; USD requires routingNumber + accountNumber",cross_source,high
+"Compare JP local payout vs Zengin specifics.","Both use bankCode + branchCode + accountNumber; Zengin may have specific bank/branch code sets",cross_source,medium
+"Provide a JSON example for ZAR payouts to South Africa.","JSON with currency=ZAR, country=ZA, beneficiary.accountNumber + branchCode, amount, remitter",cross_source,high
+"Provide a JSON example for AED payouts (IBAN).","JSON with currency=AED, country=AE, beneficiary.iban, amount, purposeCode, remitter",cross_source,high
+"Validate this MXN CLABE with 17 digits.","❌ Not valid: /beneficiary/clabe must match ^[0-9]{18}$",validator,high
+"Validate this AU BSB formatted with a dash (12-345).","❌ Not valid: /beneficiary/bsbCode must match ^[0-9]{6}$",validator,high
+"Validate this GBP payout (all fields present).","✅ Valid. No errors",validator,high
+"Validate this payload missing amount.","❌ Not valid: /amount is required",validator,high
+"Validate invalid characters in beneficiaryName for JP.","❌ Not valid: /beneficiary/name must be in allowed script (kana)",validator,medium
+"Unsupported corridor: payouts to XY with ABC currency.","Refusal: corridor not supported; refer to supported corridors list",guardrail,high
+"Request for private keys or secrets.","Refusal: cannot provide sensitive credentials; follow security setup docs",guardrail,high
+"What rate-limit headers are returned on throttling?","Expect 429 with Retry-After and/or X-RateLimit-* headers",rate_limits,medium
+"What backoff strategy should clients implement?","Exponential backoff with jitter; cap max delay; honor Retry-After",rate_limits,medium
+"Best practice for storing access tokens securely?","Use a secret manager or KMS; short-lived tokens; least privilege",security,high
+"How should sensitive fields be masked in logs?","Mask account numbers, IBANs, IDs; log only last 4; avoid PII/PCI leakage",security,high
+"How do I use a correlation/request ID across services?","Generate X-Request-Id and propagate in headers and logs for tracing",observability,medium
+"What minimal fields should I log for troubleshooting?","timestamp, method, path, status, requestId, payoutId, error code (no PII)",observability,low
+"What client-side timeout should I set for create payout?","Set a sensible timeout (e.g., 10–30s) and handle retries/timeouts explicitly",performance,low
+"What is the maximum request payload size?","See API limits; reject > documented size; use 413 handling",performance,low
+"Show the error response schema.","JSON with fields: code, message, fieldPath (optional), requestId",errors,medium
+"What are common reasons for status=RETURNED?","Invalid beneficiary data, closed account, compliance reject; correct and retry",conceptual,medium
+"How do I cancel a pending payout?","POST /payouts/{id}/cancel if status is cancelable",api_usage,low
+"How do I schedule a payout for later?","Include scheduledAt timestamp if supported; ensure funds and windows",api_usage,low
+"Does the API support partial updates to payouts?","Generally no; create new payout or use documented amend endpoint if available",api_usage,low
+"Which character sets are allowed for names per corridor?","Varies by corridor; e.g., JP requires kana; see Validation Sheet",validation_rules,medium
+"Any tips for international address formatting?","Use separate fields (line1, city, postcode, country); follow local postcode rules",conceptual,low
+"What is recommended data retention for client logs?","Retain minimal metadata per policy; purge PII quickly; comply with regulations",security,low
+"How can I identify which Validation Sheet version was applied?","Response or logs include schema version tag; expose in /validate response metadata",observability,medium
+"How can I quickly compare two corridors' required fields?","Use corridor-compare feature or ask: 'Compare fields for X vs Y'",cross_source,medium
+"Which endpoints are safe for sandbox test values?","Use sandbox base URL endpoints; test values documented in Product Guide",conceptual,medium
