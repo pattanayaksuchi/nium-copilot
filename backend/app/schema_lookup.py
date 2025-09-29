@@ -639,12 +639,10 @@ def answer_required_fields_query(query: str) -> Optional[Dict[str, Any]]:
         field_details: List[Tuple[str, str]] = []
         for field in required_fields:
             meta = props.get(field, {}) or {}
-            desc = meta.get("description")
-            if desc:
-                desc = desc.strip()
-            else:
-                pattern = meta.get("pattern")
-                desc = f"Pattern: {pattern}" if pattern else "Required field."
+            desc = meta.get("description", "Required field").strip()
+            # Clean up description to focus on key requirements
+            if "should be" in desc.lower():
+                desc = desc.split(".")[0] + "."
             field_details.append((field, desc))
 
         if not field_details:
@@ -652,77 +650,50 @@ def answer_required_fields_query(query: str) -> Optional[Dict[str, Any]]:
 
         field_map = {field: desc for field, desc in field_details}
 
+        # Create a focused response for mandatory fields only
         summary_parts: List[str] = []
-        if any(name in field_map for name in {"beneficiaryAccountNumber", "accountNumber", "beneficiary_account_number"}):
-            summary_parts.append("Include the beneficiary's account number exactly as registered.")
-        if "routingCodeValue1" in field_map or "routingCodeType1" in field_map:
-            summary_parts.append("Provide the routing code (`type` and `value`) to route the ACH payment correctly.")
-        if "beneficiaryName" in field_map:
-            summary_parts.append("Capture the beneficiary name using the allowed characters and length limits.")
-        if "destinationAmount" in field_map and "destinationCurrency" in field_map:
-            summary_parts.append("Send both destination amount and currency (USD) to meet payout validation.")
-        remitter_keys = {"remitterName", "remitterAccountType", "remitterAddress", "remitterCity", "remitterPostcode", "remitterCountryCode"}
-        if any(key in field_map for key in remitter_keys):
-            summary_parts.append("Remitter identity details (name, account type, address, country) are mandatory for US ACH payouts.")
-        if "remitPurposeCode" in field_map:
-            summary_parts.append("Supply a valid remit purpose code for compliance reporting.")
-
-        summary_text = "\n".join(summary_parts[:4]) if summary_parts else (
-            "Ensure all mandatory remitter, beneficiary, and routing fields are supplied for the payout."
-        )
-
-        bullet_lines = [f"• `{field}` — {desc}" for field, desc in field_details]
-
-        sample_payload: Dict[str, Any] = {}
-
-        def placeholder(field: str) -> str:
-            lower = field.lower()
-            if "routingcodevalue" in lower:
-                return "ACHCODE123"
-            if "routingcodetype" in lower:
-                return "ACH"
-            if field == "beneficiaryName":
-                return "ACME Recipient"
-            if "accountnumber" in lower:
-                return "1234567890"
-            if field == "destinationCurrency":
-                return corridor.currency
-            if field == "destinationAmount":
-                return "1000"
-            if field == "remitterName":
-                return "ACME Remitter"
-            if field == "remitterAccountType":
-                return "COMPANY"
-            if field == "remitterAddress":
-                return "123 Main Street"
-            if field == "remitterCity":
-                return "New York"
-            if field == "remitterPostcode":
-                return "10001"
-            if field.endswith("CountryCode"):
-                return corridor.currency[:2]
-            if field == "remitPurposeCode":
-                return "IR001"
-            if field == "beneficiaryAccountType":
-                return "COMPANY"
-            if field == "beneficiaryAddress":
-                return "123 Payment Lane"
-            if field == "beneficiaryCity":
-                return "San Francisco"
-            return "value"
-
+        summary_parts.append(f"For {corridor.currency}/{corridor.country} payouts using `{method_name}` method (`{channel_name}` channel), the following fields are **mandatory**:")
+        # List mandatory fields clearly
+        field_list = []
+        for field, desc in field_details:
+            field_list.append(f"• `{field}` - {desc}")
+        
+        summary_parts.extend(field_list)
+        
+        # Generate API-format example with actual currency
+        api_example = {
+            "method": method_name,
+            "channel": channel_name,
+            "currency": corridor.currency,
+            "country": corridor.country,
+            "details": {}
+        }
+        
         for field in required_fields:
-            sample_payload[field] = placeholder(field)
-
-        optional_snippet = ""
-        if sample_payload:
-            optional_snippet = "\n```json\n" + json.dumps(sample_payload, indent=2) + "\n```"
-
-        header = (
-            f"{summary_text}\n\nMandatory fields for **{corridor.currency}/{corridor.country}** "
-            f"`{method_name}` (`{channel_name}`) payouts:\n"
-        )
-        answer = header + "\n".join(bullet_lines) + optional_snippet
+            meta = props.get(field, {})
+            if "currency" in field.lower():
+                api_example["details"][field] = corridor.currency
+            elif "amount" in field.lower():
+                api_example["details"][field] = "1000.00"
+            elif "country" in field.lower():
+                api_example["details"][field] = corridor.country[:2] if corridor.country else "SG"
+            elif field in ["proxy_type", "proxyType"]:
+                # For proxy payments, show available types
+                proxy_types = _proxy_types_from_schema(corridor)
+                if proxy_types:
+                    api_example["details"][field] = proxy_types[0][1][0] if proxy_types[0][1] else "MOBILE"
+                else:
+                    api_example["details"][field] = "MOBILE"
+            else:
+                api_example["details"][field] = "[REQUIRED]"
+        
+        import json
+        example_json = json.dumps(api_example, indent=2)
+        
+        summary_parts.append("\n**API Format Example:**")
+        summary_parts.append(f"```json\n{example_json}\n```")
+        
+        answer = "\n".join(summary_parts)
         citations = [
             {
                 "title": f"schema_{corridor.currency}_{corridor.country}.json",
