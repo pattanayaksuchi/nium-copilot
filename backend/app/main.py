@@ -99,6 +99,7 @@ def search(payload: schemas.SearchReq) -> Dict[str, Any]:
 def chat(payload: schemas.ChatReq) -> schemas.ChatResp:
     schema_answer = (
         schema_lookup.answer_create_payout_query(payload.message)
+        or schema_lookup.answer_api_usage_query(payload.message)
         or schema_lookup.answer_validation_query(payload.message)
         or schema_lookup.answer_mandatory_difference_query(payload.message)
         or schema_lookup.answer_required_fields_query(payload.message)
