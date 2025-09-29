@@ -1,0 +1,25 @@
+question,expected_response,category,priority
+"What are the mandatory fields for USD payouts to the US?","accountNumber, routingNumber, beneficiaryName, remitterName, amount, purposeCode",mandatory_fields,high
+"What are the required fields for INR payouts to India?","accountNumber, IFSC, beneficiaryName, remitterName, amount, purposeCode",mandatory_fields,high
+"What are the required fields for EUR payouts to Germany?","IBAN, beneficiaryName, remitterName, amount, purposeCode (if applicable), BIC (if required by partner)",mandatory_fields,high
+"What are the required fields for GBP payouts to the UK?","accountNumber, sortCode, beneficiaryName, remitterName, amount, purposeCode (if applicable)",mandatory_fields,high
+"What are the required fields for SGD payouts to Singapore?","accountNumber, bankCode, branchCode, beneficiaryName, remitterName, amount, purposeCode",mandatory_fields,high
+"What are the required fields for MYR payouts to Malaysia?","accountNumber, beneficiaryName, nationalId (NRIC/PASSPORT) or businessId, amount, remitterName",mandatory_fields,high
+"What are the required fields for KRW payouts to South Korea?","accountNumber, bankCode, beneficiaryName (local language if required), amount, remitterName",mandatory_fields,medium
+"What are the required fields for JPY payouts to Japan?","accountNumber, bankCode, branchCode, beneficiaryName (kana if required), amount, remitterName",mandatory_fields,medium
+"What additional fields are needed for USD business senders?","entityType=business requires businessName, registrationNumber, businessAddress",mandatory_fields,medium
+"What additional fields are needed for EUR consumer senders?","entityType=individual requires firstName, lastName, dateOfBirth, address",mandatory_fields,medium
+"List all required fields for PHP payouts to the Philippines.","accountNumber, beneficiaryName, bankCode (if applicable), amount, remitterName",mandatory_fields,medium
+"Compare required fields for SGD vs MYR payouts.","SGD: accountNumber, bankCode, branchCode; MYR: accountNumber, NRIC/PASSPORT or businessId; both require beneficiaryName, amount, remitterName",mandatory_fields,high
+"What regex is applied for the UK sort code?","Regex pattern: ^[0-9]{6}$ (or ##-##-## if allowed by partner)",validation_rules,medium
+"What regex is applied for US routing number?","Regex pattern: ^[0-9]{9}$",validation_rules,medium
+"What is the expected length/format for an IBAN?","Up to 34 alphanumeric characters; country-specific lengths enforced",validation_rules,medium
+"What proxy types are supported for Malaysia?","NRIC, PASSPORT, CORPORATE, REGISTRATION, MOBILE",proxy_values,high
+"What proxy types are supported for Singapore?","UEN, NRIC, FIN, MOBILE, EMAIL (if supported)",proxy_values,medium
+"What proxy types are supported for India?","MOBILE, EMAIL (if supported), PAN (if supported by proxy rails)",proxy_values,low
+"How do I create a payout via API?","POST /payouts with Authorization and Content-Type headers; body includes country, currency, amount, beneficiary",api_usage,high
+"How do I retrieve payout status?","GET /payouts/{id} returns status, reason, timestamps; optional filters by reference",api_usage,high
+"How do I list payouts for a date range?","GET /payouts?from=YYYY-MM-DD&to=YYYY-MM-DD with pagination",api_usage,medium
+"How do I authenticate requests?","Use API key or OAuth2 client-credentials as per docs; include Bearer token in Authorization header",api_usage,high
+"How do I register webhooks?","POST /webhooks with target URL and subscribed events; verify webhook signature on receipt",api_usage,medium
+"How do I resend webhook events?","POST /webhooks/{id}/replay or retry via dashboard if supported",api_usage,low
