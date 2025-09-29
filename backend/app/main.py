@@ -233,15 +233,26 @@ def send_message(
     # Add user message to conversation
     conversation_store.add_message(client_id, conversation_id, user_message)
     
-    # Get conversation context for RAG
-    context_messages = conversation_store.get_conversation_context(client_id, conversation_id)
+    # First try schema-based answers (same as /chat endpoint)
+    schema_answer = (
+        schema_lookup.answer_create_payout_query(request.content)
+        or schema_lookup.answer_validation_query(request.content)
+        or schema_lookup.answer_mandatory_difference_query(request.content)
+        or schema_lookup.answer_required_fields_query(request.content)
+        or schema_lookup.answer_remittance_template_query(request.content)
+        or schema_lookup.answer_payout_methods_query(request.content)
+        or schema_lookup.answer_regex_query(request.content)
+        or schema_lookup.answer_proxy_query(request.content)
+    )
     
-    # Build contextual prompt
-    context_prompt = _build_contextual_prompt(request.content, context_messages)
-    
-    # Use existing RAG pipeline with context
-    chunks = rag.hybrid_search(context_prompt, k=30)
-    answer = rag.synthesize_answer(context_prompt, chunks)
+    if schema_answer:
+        answer = schema_answer
+    else:
+        # Fall back to context-aware RAG if no schema match
+        context_messages = conversation_store.get_conversation_context(client_id, conversation_id)
+        context_prompt = _build_contextual_prompt(request.content, context_messages)
+        chunks = rag.hybrid_search(context_prompt, k=30)
+        answer = rag.synthesize_answer(context_prompt, chunks)
     
     if not answer:
         raise HTTPException(status_code=500, detail="Unable to generate answer.")
