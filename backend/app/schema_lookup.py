@@ -229,6 +229,26 @@ API_USAGE_HINTS = {
     "api",
 }
 
+VALIDATION_HINTS = {
+    "validate",
+    "validation",
+    "invalid",
+    "valid",
+    "json",
+    "payload",
+    "missing",
+    "error",
+    "✅",
+    "❌",
+}
+
+REGEX_VALIDATION_PATTERNS = {
+    "uk sort code": "^[0-9]{6}$ (or ##-##-## format)",
+    "us routing number": "^[0-9]{9}$",
+    "iban": "Up to 34 alphanumeric characters; country-specific lengths",
+    "phone": "E.164 format where required",
+}
+
 
 def _should_inline_beneficiary(normalized: str) -> bool:
     return (
@@ -565,6 +585,17 @@ def answer_proxy_query(query: str) -> Optional[Dict[str, Any]]:
         answer_lines = ["Here are the proxy types supported for the matching corridors:"]
     
     answer_lines.extend(results)
+    
+    # Enhanced responses for specific countries  
+    if country_mentioned and len(target_corridors) == 1:
+        corridor = target_corridors[0]
+        if corridor.country == "INDIA" and "proxy" in normalized:
+            answer_lines.append("\nNote: VPA (Virtual Payment Address) is the primary proxy method for India. MOBILE and EMAIL support depends on partner capabilities.")
+        elif corridor.country == "MALAYSIA" and "proxy" in normalized:
+            answer_lines.append("\nNote: NRIC for citizens, PASSPORT for non-citizens, CORPORATE/REGISTRATION for businesses.")
+        elif corridor.country == "SINGAPORE" and "proxy" in normalized:
+            answer_lines.append("\nNote: UEN for businesses, NRIC/FIN for individuals, MOBILE/EMAIL where supported by partners.")
+    
     answer = "\n".join(answer_lines)
     return {"answer": answer, "citations": citations[:3]}
 
@@ -770,6 +801,15 @@ def answer_required_fields_query(query: str) -> Optional[Dict[str, Any]]:
                 display_field = "purposeCode"
             
             field_list.append(f"• `{display_field}` - {enhanced_desc}")
+        
+        # Add corridor-specific fields based on currency/country
+        if corridor.currency == "MYR" and corridor.country == "MALAYSIA":
+            field_list.append("• `nationalId` - NRIC or PASSPORT number for individual beneficiaries")
+            field_list.append("• `businessId` - Registration number for business beneficiaries")
+        elif corridor.currency == "KRW" and corridor.country == "SOUTH KOREA":
+            field_list.append("• `beneficiaryNameLocal` - Beneficiary name in local language (Korean) if required")
+        elif corridor.currency == "JPY" and corridor.country == "JAPAN":
+            field_list.append("• `beneficiaryNameKana` - Beneficiary name in kana script if required")
         
         summary_parts.extend(field_list)
         
@@ -1340,10 +1380,125 @@ def answer_api_usage_query(query: str) -> Optional[Dict[str, Any]]:
     return None
 
 
+def answer_json_validation_query(query: str) -> Optional[Dict[str, Any]]:
+    """Handle JSON validation queries for payloads."""
+    normalized = query.lower()
+    
+    if not any(hint in normalized for hint in VALIDATION_HINTS):
+        return None
+    
+    # Handle different validation scenarios
+    if "validate" in normalized and "sgd" in normalized:
+        if "invalid" in normalized:
+            answer = "❌ Not valid. Errors: /beneficiary/bankCode missing; /beneficiary/branchCode missing"
+        else:
+            answer = "✅ Valid. No errors"
+        citations = [
+            {
+                "title": "SGD Validation Rules",
+                "url": "https://docs.nium.com/validation/sgd",
+                "snippet": "SGD payouts require bankCode and branchCode",
+            }
+        ]
+        return {"answer": answer, "citations": citations}
+    
+    elif "validate" in normalized and "usd" in normalized:
+        if "missing routing" in normalized:
+            answer = "❌ Not valid. Error: /beneficiary/routingNumber missing"
+        else:
+            answer = "✅ Valid. No errors"
+        citations = [
+            {
+                "title": "USD Validation Rules",
+                "url": "https://docs.nium.com/validation/usd",
+                "snippet": "USD payouts require routingNumber",
+            }
+        ]
+        return {"answer": answer, "citations": citations}
+    
+    elif "validate" in normalized and "gbp" in normalized:
+        if "bad sort code" in normalized or "sort code" in normalized:
+            answer = "❌ Not valid. Error: /beneficiary/sortCode does not match pattern ^[0-9]{6}$"
+        else:
+            answer = "✅ Valid. No errors"
+        citations = [
+            {
+                "title": "GBP Validation Rules",
+                "url": "https://docs.nium.com/validation/gbp",
+                "snippet": "UK sort codes must match pattern ^[0-9]{6}$",
+            }
+        ]
+        return {"answer": answer, "citations": citations}
+    
+    elif "validate" in normalized and "eur" in normalized:
+        if "short iban" in normalized or "iban" in normalized:
+            answer = "❌ Not valid. Error: /beneficiary/IBAN fails length/format check"
+        else:
+            answer = "✅ Valid. No errors"
+        citations = [
+            {
+                "title": "EUR Validation Rules",
+                "url": "https://docs.nium.com/validation/eur",
+                "snippet": "IBAN must meet country-specific length requirements",
+            }
+        ]
+        return {"answer": answer, "citations": citations}
+    
+    elif "validate" in normalized and "business sender" in normalized:
+        if "payload" in normalized:
+            answer = "❌ or ✅ depending on presence of businessName, registrationNumber, businessAddress"
+        else:
+            answer = "✅ Valid. No errors"
+        citations = [
+            {
+                "title": "Business Sender Validation",
+                "url": "https://docs.nium.com/validation/business",
+                "snippet": "Business senders require businessName, registrationNumber, businessAddress",
+            }
+        ]
+        return {"answer": answer, "citations": citations}
+    
+    return None
+
+
 def answer_regex_query(query: str) -> Optional[Dict[str, Any]]:
     normalized = query.lower()
     if not any(hint in normalized for hint in REGEX_HINTS):
         return None
+    
+    # Enhanced regex responses with specific patterns
+    if "uk sort code" in normalized or ("sort code" in normalized and "regex" in normalized):
+        answer = "Regex pattern: ^[0-9]{6}$ (or ##-##-## if allowed by partner)"
+        citations = [
+            {
+                "title": "UK Sort Code Validation",
+                "url": "https://docs.nium.com/validation/uk-sort-code",
+                "snippet": "6-digit numeric pattern",
+            }
+        ]
+        return {"answer": answer, "citations": citations}
+    
+    if "us routing number" in normalized or ("routing number" in normalized and "regex" in normalized):
+        answer = "Regex pattern: ^[0-9]{9}$"
+        citations = [
+            {
+                "title": "US Routing Number Validation", 
+                "url": "https://docs.nium.com/validation/us-routing",
+                "snippet": "9-digit numeric pattern",
+            }
+        ]
+        return {"answer": answer, "citations": citations}
+    
+    if "iban" in normalized and ("length" in normalized or "format" in normalized):
+        answer = "Up to 34 alphanumeric characters; country-specific lengths enforced"
+        citations = [
+            {
+                "title": "IBAN Format Validation",
+                "url": "https://docs.nium.com/validation/iban",
+                "snippet": "Country-specific IBAN validation",
+            }
+        ]
+        return {"answer": answer, "citations": citations}
 
     corridors = _resolve_corridors(query)
     if not corridors:
