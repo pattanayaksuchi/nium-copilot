@@ -5,7 +5,7 @@ import { ChatInterface } from '../../src/components/ChatInterface';
 import { AppShell } from '../../src/components/AppShell';
 import { QueryProvider } from '../../src/components/QueryProvider';
 import { ToastProvider } from '../../src/components/Toast';
-import { MessageCircle, Minimize2, Maximize2, X } from 'lucide-react';
+import { MessageCircle, Minimize2, Maximize2, X, Bot } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 export default function WidgetPage() {
@@ -61,10 +61,12 @@ export default function WidgetPage() {
           width: '100%',
           height: '100%',
           background: 'white',
-          borderRadius: widgetState === 'compact' ? '16px' : '16px',
+          borderRadius: '16px',
           overflow: 'hidden',
           boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)',
-          position: 'relative'
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column'
         }}>
           {/* Widget Header */}
           <div style={{
@@ -73,7 +75,8 @@ export default function WidgetPage() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            background: '#f9fafb'
+            background: '#f9fafb',
+            flexShrink: 0
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <div style={{
@@ -85,7 +88,7 @@ export default function WidgetPage() {
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
-                <MessageCircle size={12} color="white" />
+                <Bot size={12} color="white" />
               </div>
               <span style={{ fontSize: '14px', fontWeight: '600', color: '#111827' }}>
                 Nium Developer Copilot
@@ -141,12 +144,21 @@ export default function WidgetPage() {
 
           {/* Widget Content */}
           <div style={{ 
-            height: widgetState === 'compact' ? 'calc(500px - 49px)' : 'calc(100vh - 81px)',
-            overflow: 'hidden'
+            flex: 1,
+            overflow: 'hidden',
+            display: 'flex'
           }}>
-            <AppShell sidebar={<ConversationSidebar />}>
-              <ChatInterface isCompact={widgetState === 'compact'} />
-            </AppShell>
+            {widgetState === 'maximized' ? (
+              // Full interface with sidebar when maximized
+              <AppShell sidebar={<ConversationSidebar />}>
+                <ChatInterface isCompact={false} />
+              </AppShell>
+            ) : (
+              // Clean chat interface only when compact
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: '#f8fafc' }}>
+                <ChatInterface isCompact={true} />
+              </div>
+            )}
           </div>
         </div>
       </ToastProvider>
