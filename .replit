@@ -38,13 +38,13 @@ waitForPort = 8000
 name = "Frontend"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd frontend && npm run dev -- -p 5000"
-waitForPort = 5000
-
 [workflows.workflow.metadata]
 outputType = "webview"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd frontend && NEXT_BUILD_MODE=development npm run dev -- -p 5000"
+waitForPort = 5000
 
 [[ports]]
 localPort = 3000
@@ -55,14 +55,10 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 8000
-externalPort = 8000
-
-[[ports]]
-localPort = 36363
-externalPort = 3000
+localPort = 36113
+externalPort = 3002
 
 [deployment]
 deploymentTarget = "vm"
-build = ["bash", "-c", "cd frontend && npm install && npm run build"]
-run = ["bash", "-c", "(cd backend && python main_simple.py) & sleep 2 && cd frontend && npm start"]
+build = ["bash", "-c", "python -m pip install -r backend/requirements.txt && cd frontend && npm install && npm run build"]
+run = ["bash", "-c", "(cd backend && python main_simple.py) & for i in {1..60}; do (echo >/dev/tcp/127.0.0.1/8000) >/dev/null 2>&1 && break; sleep 0.5; done; cd frontend && npm start -p 5000"]

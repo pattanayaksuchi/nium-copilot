@@ -1,6 +1,7 @@
 backend/data/Nium_Validation_Fields.xlsx
 backend/build/
 frontend/.next/
+frontend/.next-dev/
 frontend/node_modules/
 .env
 backend/.env
