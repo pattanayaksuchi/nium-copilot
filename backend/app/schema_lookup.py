@@ -694,7 +694,24 @@ def answer_required_fields_query(query: str) -> Optional[Dict[str, Any]]:
         # List mandatory fields clearly
         field_list = []
         for field, desc in field_details:
-            field_list.append(f"• `{field}` - {desc}")
+            # Enhance descriptions for key banking fields
+            enhanced_desc = desc
+            if field == "routingCodeType1":
+                if "SWIFT" in desc:
+                    enhanced_desc = f"{desc} (Bank code identifier)"
+                elif "IFSC" in desc:
+                    enhanced_desc = f"{desc} (Bank IFSC code)"
+                else:
+                    enhanced_desc = f"{desc} (Routing/Bank code type)"
+            elif field == "routingCodeValue1":
+                if "SWIFT" in desc:
+                    enhanced_desc = f"{desc} (Bank SWIFT/BIC code)"
+                elif "IFSC" in desc:
+                    enhanced_desc = f"{desc} (Bank IFSC code)"
+                else:
+                    enhanced_desc = f"{desc} (Bank routing code)"
+            
+            field_list.append(f"• `{field}` - {enhanced_desc}")
         
         summary_parts.extend(field_list)
         
