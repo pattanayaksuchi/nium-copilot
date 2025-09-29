@@ -810,6 +810,17 @@ def answer_required_fields_query(query: str) -> Optional[Dict[str, Any]]:
             field_list.append("• `beneficiaryNameLocal` - Beneficiary name in local language (Korean) if required")
         elif corridor.currency == "JPY" and corridor.country == "JAPAN":
             field_list.append("• `beneficiaryNameKana` - Beneficiary name in kana script if required")
+            
+        # Add business vs individual sender requirements
+        if "business" in normalized:
+            field_list.append("• `businessName` - Legal name of the business entity")
+            field_list.append("• `registrationNumber` - Business registration or license number")
+            field_list.append("• `businessAddress` - Registered business address")
+        elif "consumer" in normalized or "individual" in normalized:
+            field_list.append("• `firstName` - Individual's first name")
+            field_list.append("• `lastName` - Individual's last name") 
+            field_list.append("• `dateOfBirth` - Date of birth (YYYY-MM-DD format)")
+            field_list.append("• `address` - Individual's residential address")
         
         summary_parts.extend(field_list)
         
