@@ -276,7 +276,7 @@ class FrontendSyncTester:
 
 async def main():
     tester = FrontendSyncTester()
-    results = await tester.run_all_tests("test_subset.csv")
+    results = await tester.run_all_tests("../attached_assets/test_cases_1759132102565.csv")
     
     # Output JSON results
     print("\n" + "="*80)
