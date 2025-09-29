@@ -11,5 +11,7 @@ if __name__ == "__main__":
     port = 8000
     # Set CORS origins for iframe widget support
     os.environ.setdefault("CORS_ORIGINS", "*")
-    # Using 0.0.0.0 for Replit environment
-    uvicorn.run("app.main:app", host="0.0.0.0", port=port, reload=False)
+    # In production, bind to 127.0.0.1 for security; in dev use 0.0.0.0
+    is_production = os.environ.get("REPLIT_DEPLOYMENT") == "1"
+    host = "127.0.0.1" if is_production else "0.0.0.0"
+    uvicorn.run("app.main:app", host=host, port=port, reload=False)
