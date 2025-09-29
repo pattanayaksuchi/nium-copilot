@@ -55,5 +55,5 @@ localPort = 8000
 externalPort = 8000
 
 [deployment]
-deploymentTarget = "vm"
-run = ["cd", "backend", "&&", "python", "main_simple.py"]
+deploymentTarget = "autoscale"
+run = ["bash", "-c", "cd backend && python main_simple.py"]
