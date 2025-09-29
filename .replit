@@ -58,6 +58,10 @@ externalPort = 80
 localPort = 8000
 externalPort = 8000
 
+[[ports]]
+localPort = 43281
+externalPort = 3000
+
 [deployment]
 deploymentTarget = "vm"
 build = ["cd", "frontend", "&&", "npm", "install", "&&", "npm", "run", "build"]
