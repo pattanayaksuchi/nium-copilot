@@ -4,11 +4,15 @@ import { v4 as uuidv4 } from 'uuid';
 // Configure API base URL for different environments
 const getApiBaseUrl = () => {
   if (typeof window !== 'undefined') {
+    // In Replit development environment, use proxy through frontend
+    if (window.location.hostname.includes('replit.dev')) {
+      return `${window.location.origin}/api`;
+    }
     // In production (replit.app), backend and frontend are served from the same origin
     if (window.location.hostname.includes('replit.app')) {
       return window.location.origin;
     }
-    // For both local development and Replit dev environment, use localhost with port 8000
+    // For local development, use localhost with port 8000
     return 'http://localhost:8000';
   }
   return 'http://localhost:8000';
@@ -97,31 +101,21 @@ class ApiClient {
     const url = `${this.baseUrl}${endpoint}`;
     const clientId = getClientId();
 
-    console.log(`API Request: ${options.method || 'GET'} ${url}`);
-    
-    try {
-      const response = await fetch(url, {
-        ...options,
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Client-Id': clientId,
-          ...options.headers,
-        },
-      });
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Client-Id': clientId,
+        ...options.headers,
+      },
+    });
 
-      console.log(`API Response: ${response.status} ${response.statusText}`);
-
-      if (!response.ok) {
-        const error = await response.text();
-        console.error(`API Error: ${response.status} - ${error}`);
-        throw new Error(`API Error: ${response.status} - ${error}`);
-      }
-
-      return response.json();
-    } catch (error) {
-      console.error('Network error:', error);
-      throw error;
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`API Error: ${response.status} - ${error}`);
     }
+
+    return response.json();
   }
 
   // Conversation management
