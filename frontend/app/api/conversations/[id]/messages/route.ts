@@ -1,0 +1,33 @@
+import { NextRequest, NextResponse } from 'next/server';
+
+const BACKEND_URL = 'http://localhost:8000';
+
+export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const clientId = request.headers.get('X-Client-Id');
+    if (!clientId) {
+      return NextResponse.json({ detail: 'X-Client-Id header is required' }, { status: 400 });
+    }
+
+    const body = await request.text();
+    const response = await fetch(`${BACKEND_URL}/conversations/${params.id}/messages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Client-Id': clientId,
+      },
+      body,
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      return NextResponse.json({ detail: error }, { status: response.status });
+    }
+
+    const data = await response.json();
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error('Proxy error:', error);
+    return NextResponse.json({ detail: 'Internal proxy error' }, { status: 500 });
+  }
+}
