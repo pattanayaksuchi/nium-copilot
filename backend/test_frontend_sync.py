@@ -8,6 +8,7 @@ Only reports scenarios where responses are not in sync or don't match expected s
 import asyncio
 import csv
 import json
+import os
 import re
 import time
 from dataclasses import dataclass
@@ -142,7 +143,7 @@ class FrontendSyncTester:
         
     async def create_conversation(self) -> str:
         """Create a new conversation and return the ID"""
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(verify=False) as client:
             response = await client.post(
                 f"{self.api_proxy_url}/conversations",
                 headers={
@@ -160,7 +161,7 @@ class FrontendSyncTester:
         """Send message through frontend and return response + time taken"""
         start_time = time.time()
         
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        async with httpx.AsyncClient(timeout=30.0, verify=False) as client:
             response = await client.post(
                 f"{self.api_proxy_url}/conversations/{conversation_id}/messages",
                 headers={
@@ -275,7 +276,7 @@ class FrontendSyncTester:
 
 async def main():
     tester = FrontendSyncTester()
-    results = await tester.run_all_tests("test_subset.csv")
+    results = await tester.run_all_tests("../attached_assets/test_cases_1759132102565.csv")
     
     # Output JSON results
     print("\n" + "="*80)
