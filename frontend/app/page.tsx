@@ -250,82 +250,39 @@ export default function DocsPage() {
         </div>
       </footer>
 
-      {/* Chat Widget - Updated for seamless experience */}
-      <div className="chat-widget" id="nium-chat-widget">
-        <MessageCircle size={24} />
-      </div>
-
-      {/* Chat Widget Script - Enhanced for seamless experience */}
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `
-            // Enhanced seamless chat widget experience
-            (function() {
-              let widgetFrame = null;
-              let isExpanded = false;
-              
-              function createWidgetFrame() {
-                if (widgetFrame) return;
-                
-                widgetFrame = document.createElement('iframe');
-                widgetFrame.src = window.location.origin + '/widget';
-                widgetFrame.style.cssText = \`
-                  position: fixed;
-                  bottom: 24px;
-                  right: 24px;
-                  width: 56px;
-                  height: 56px;
-                  border: none;
-                  border-radius: 50%;
-                  z-index: 2147483647;
-                  transition: all 0.3s ease;
-                  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                  background: transparent;
-                  overflow: hidden;
-                \`;
-                
-                document.body.appendChild(widgetFrame);
-                
-                // Listen for resize messages from widget
-                window.addEventListener('message', function(event) {
-                  if (event.data.type === 'nium-copilot-resize') {
-                    const { width, height, state } = event.data;
-                    if (state === 'minimized') {
-                      widgetFrame.style.width = '56px';
-                      widgetFrame.style.height = '56px';
-                      widgetFrame.style.borderRadius = '50%';
-                      isExpanded = false;
-                    } else if (state === 'compact') {
-                      widgetFrame.style.width = '400px';
-                      widgetFrame.style.height = '500px';
-                      widgetFrame.style.borderRadius = '16px';
-                      isExpanded = true;
-                    } else if (state === 'maximized') {
-                      widgetFrame.style.width = 'calc(100vw - 32px)';
-                      widgetFrame.style.height = 'calc(100vh - 32px)';
-                      widgetFrame.style.borderRadius = '16px';
-                      widgetFrame.style.bottom = '16px';
-                      widgetFrame.style.right = '16px';
-                      isExpanded = true;
-                    }
-                  }
-                });
-              }
-              
-              // Initialize widget when page loads
-              setTimeout(() => {
-                createWidgetFrame();
-                
-                // Hide the original button since iframe will handle it
-                const originalButton = document.getElementById('nium-chat-widget');
-                if (originalButton) {
-                  originalButton.style.display = 'none';
-                }
-              }, 1000);
-            })();
-          `
+      {/* Chat Widget - Simple link to dev-copilot */}
+      <a 
+        href="/dev-copilot"
+        className="chat-widget" 
+        id="nium-chat-widget"
+        style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          width: '56px',
+          height: '56px',
+          background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textDecoration: 'none',
+          color: 'white',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+          transition: 'all 0.3s ease',
+          zIndex: 1000
         }}
-      />
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'scale(1.05)';
+          e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.2)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'scale(1)';
+          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+        }}
+      >
+        <MessageCircle size={24} />
+      </a>
     </div>
   );
 }
