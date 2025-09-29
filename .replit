@@ -56,5 +56,5 @@ externalPort = 8000
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["bash", "-c", "cd backend && python main_simple.py & cd frontend && PORT=${PORT:-3000} npm run start -- -p ${PORT:-3000}"]
-build = ["bash", "-c", "cd frontend && npm run build"]
+run = ["npm", "run", "start"]
+build = ["npm", "run", "build"]
