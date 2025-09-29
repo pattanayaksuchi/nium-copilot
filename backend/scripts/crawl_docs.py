@@ -7,11 +7,12 @@ import json
 from collections import deque
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Iterable, List, Set, Tuple
+from typing import Dict, Iterable, List, Set, Tuple, Sequence, cast
 from urllib.parse import urljoin, urlparse
 
 import httpx
 from bs4 import BeautifulSoup
+from bs4.element import Tag
 from markdownify import markdownify
 from readability import Document
 from tenacity import RetryError, retry, stop_after_attempt, wait_fixed
@@ -55,9 +56,12 @@ def same_host(url: str, root: str) -> bool:
 
 def extract_links(html: str, base_url: str) -> Iterable[str]:
     soup = BeautifulSoup(html, "lxml")
-    for anchor in soup.find_all("a", href=True):
-        href = anchor.get("href")
-        if href.startswith("mailto:") or href.startswith("#"):
+    anchors: List[Tag] = cast(List[Tag], soup.select("a[href]"))
+    for a in anchors:
+        href = a.get("href")
+        if not isinstance(href, str):
+            continue
+        if href.startswith(("mailto:", "#", "javascript:")):
             continue
         yield urljoin(base_url, href)
 
@@ -82,7 +86,10 @@ def crawl(roots: Iterable[str], out_dir: Path) -> List[Dict[str, str]]:
     out_dir.mkdir(parents=True, exist_ok=True)
     metadata: List[Dict[str, str]] = []
     visited: Set[str] = set()
-
+    
+    # Pre-compute allowed hosts for domain-level filtering
+    allowed_hosts = {urlparse(root).netloc for root in roots}
+    
     queue: deque[Page] = deque(Page(url=root, depth=0) for root in roots)
     while queue:
         page = queue.popleft()
@@ -107,9 +114,8 @@ def crawl(roots: Iterable[str], out_dir: Path) -> List[Dict[str, str]]:
             continue
 
         for link in extract_links(html, page.url):
-            if not any(link.startswith(root) for root in roots):
-                continue
-            if not same_host(link, page.url):
+            # Use domain-level filtering instead of restrictive path matching
+            if urlparse(link).netloc not in allowed_hosts:
                 continue
             if link in visited:
                 continue
@@ -117,7 +123,7 @@ def crawl(roots: Iterable[str], out_dir: Path) -> List[Dict[str, str]]:
     return metadata
 
 
-def main(args: Iterable[str] | None = None) -> None:
+def main(args: Sequence[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Crawl Nium docs and build markdown corpus.")
     parser.add_argument("--out", type=Path, default=settings.CORPUS_DIR, help="Output directory for markdown files.")
     parsed = parser.parse_args(args=args)
