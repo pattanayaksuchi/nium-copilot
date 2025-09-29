@@ -160,101 +160,102 @@ export function ConversationSidebar() {
 
   if (sidebarCollapsed) {
     return (
-      <div className="w-12 bg-panel border-r border-subtle flex flex-col items-center py-4 shadow-custom">
+      <div className="conversation-sidebar-collapsed">
         <button
           onClick={() => setSidebarCollapsed(false)}
-          className="p-2 text-muted hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-custom hover-lift"
+          className="sidebar-control-btn"
         >
-          <ChevronRight className="w-5 h-5" />
+          <ChevronRight size={20} />
         </button>
         <button
           onClick={handleNewChat}
-          className="mt-4 p-2 text-muted hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-custom hover-lift"
+          className="sidebar-control-btn"
+          style={{ marginTop: '16px' }}
           title="New Chat"
         >
-          <Plus className="w-5 h-5" />
+          <Plus size={20} />
         </button>
       </div>
     );
   }
 
   return (
-    <div className="w-80 bg-panel border-r border-subtle flex flex-col h-full shadow-custom">
+    <div className="conversation-sidebar" style={{ width: '320px' }}>
       {/* Header */}
-      <div className="p-4 border-b border-subtle bg-surface">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-semibold text-gray-900">Conversations</h2>
+      <div className="conversation-header">
+        <div className="conversation-header-title">
+          <span>Conversations</span>
           <button
             onClick={() => setSidebarCollapsed(true)}
-            className="p-1 text-muted hover:text-gray-900 hover:bg-gray-100 rounded transition-custom"
+            className="sidebar-control-btn"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft size={16} />
           </button>
         </div>
         
-        <SearchInput 
+        <input
+          type="text"
           value={searchQuery}
-          onChange={setSearchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search conversations..."
+          className="conversation-search"
         />
         
         <button
           onClick={handleNewChat}
           disabled={createConversation.isPending || conversations.length >= 10}
-          className="mt-3 w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105"
+          className="new-chat-btn"
         >
-          <Plus className="w-4 h-4" />
+          <Plus size={16} />
           New Chat
           {conversations.length >= 10 && (
-            <span className="text-xs opacity-90">(Max 10)</span>
+            <span style={{ fontSize: '12px', opacity: 0.9 }}>(Max 10)</span>
           )}
         </button>
       </div>
 
       {/* Conversations List */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin">
+      <div className="conversation-list">
         {isLoading ? (
-          <div className="p-4">
+          <div style={{ padding: '16px' }}>
             <ConversationListSkeleton />
           </div>
         ) : filteredConversations.length === 0 ? (
-          <div className="p-6 text-center text-muted">
-            <MessageSquare className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-            <p className="font-medium mb-1">
+          <div className="conversation-empty">
+            <MessageSquare className="conversation-empty-icon" />
+            <p className="conversation-empty-title">
               {searchQuery ? 'No conversations found' : 'No conversations yet'}
             </p>
-            <p className="text-sm text-subtle">
+            <p className="conversation-empty-description">
               {searchQuery ? 'Try a different search term' : 'Start a new chat to get started'}
             </p>
           </div>
         ) : (
-          <div className="p-3 space-y-6">
+          <div>
             {Object.entries(groupedConversations).map(([group, groupConversations]) => {
               if (groupConversations.length === 0) return null;
               
               return (
-                <div key={group}>
-                  <h3 className="text-xs font-semibold text-muted uppercase tracking-wider px-2 mb-2">
+                <div key={group} className="conversation-group">
+                  <h3 className="conversation-group-title">
                     {group}
                   </h3>
-                  <div className="space-y-1">
+                  <div>
                     {groupConversations.map((conversation) => (
-                      <div key={conversation.id} className="relative">
+                      <div key={conversation.id} className="conversation-item">
                         <div
-                          className={`group flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-150 ${
-                            selectedConversationId === conversation.id
-                              ? 'bg-blue-50 border border-blue-200 shadow-sm'
-                              : 'hover:bg-surface hover:shadow-sm'
+                          className={`conversation-link ${
+                            selectedConversationId === conversation.id ? 'conversation-link-active' : ''
                           }`}
                           onClick={() => setSelectedConversationId(conversation.id)}
                         >
-                          <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                            selectedConversationId === conversation.id
-                              ? 'bg-blue-500'
-                              : 'bg-gray-300 group-hover:bg-gray-400'
-                          } transition-colors`} />
+                          <div className={`conversation-indicator ${
+                            selectedConversationId === conversation.id 
+                              ? 'conversation-indicator-active' 
+                              : 'conversation-indicator-default'
+                          }`} />
                           
-                          <div className="flex-1 min-w-0">
+                          <div className="conversation-details">
                             {editingId === conversation.id ? (
                               <input
                                 type="text"
@@ -265,15 +266,15 @@ export function ConversationSidebar() {
                                   if (e.key === 'Enter') handleSaveEdit();
                                   if (e.key === 'Escape') handleCancelEdit();
                                 }}
-                                className="w-full px-2 py-1 text-sm bg-surface border border-subtle rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-custom"
+                                className="conversation-edit-input"
                                 autoFocus
                               />
                             ) : (
                               <>
-                                <h3 className="text-sm font-medium text-gray-900 truncate leading-5">
+                                <h3 className="conversation-title">
                                   {conversation.title}
                                 </h3>
-                                <div className="flex items-center gap-2 text-xs text-subtle mt-1">
+                                <div className="conversation-meta">
                                   <span>{formatDate(conversation.updated_at)}</span>
                                   {conversation.messages_count > 0 && (
                                     <>
@@ -291,27 +292,27 @@ export function ConversationSidebar() {
                               e.stopPropagation();
                               setShowDropdown(showDropdown === conversation.id ? null : conversation.id);
                             }}
-                            className="opacity-0 group-hover:opacity-100 p-1.5 text-muted hover:text-gray-900 hover:bg-gray-100 rounded-md transition-all"
+                            className="conversation-menu-btn"
                           >
-                            <MoreVertical className="w-4 h-4" />
+                            <MoreVertical size={16} />
                           </button>
                         </div>
 
                         {/* Dropdown Menu */}
                         {showDropdown === conversation.id && (
-                          <div className="absolute right-2 top-12 z-20 bg-surface border border-subtle rounded-lg shadow-custom-lg py-1 w-36 animate-in slide-in-from-top-2 duration-150">
+                          <div className="conversation-dropdown">
                             <button
                               onClick={() => handleEdit(conversation.id, conversation.title)}
-                              className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-custom"
+                              className="conversation-dropdown-item"
                             >
-                              <Edit2 className="w-3 h-3" />
+                              <Edit2 size={14} />
                               Rename
                             </button>
                             <button
                               onClick={() => handleDelete(conversation.id)}
-                              className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-custom"
+                              className="conversation-dropdown-item conversation-dropdown-item-danger"
                             >
-                              <Trash2 className="w-3 h-3" />
+                              <Trash2 size={14} />
                               Delete
                             </button>
                           </div>

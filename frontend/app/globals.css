@@ -729,6 +729,327 @@ body {
   }
 }
 
+/* Conversation Sidebar Styles - Matching Chat Theme */
+.conversation-sidebar {
+  background: #f8fafc;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.conversation-sidebar-collapsed {
+  width: 48px;
+  background: #f8fafc;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.conversation-header {
+  padding: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  background: white;
+}
+
+.conversation-header-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.conversation-search {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.conversation-search:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.new-chat-btn {
+  margin-top: 12px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.new-chat-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.new-chat-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.conversation-list {
+  flex: 1;
+  overflow-y: auto;
+  background: #f8fafc;
+  padding: 12px;
+}
+
+.conversation-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.conversation-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.conversation-list::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 3px;
+}
+
+.conversation-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.6);
+}
+
+.conversation-group {
+  margin-bottom: 24px;
+}
+
+.conversation-group-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0 8px;
+  margin-bottom: 8px;
+}
+
+.conversation-item {
+  position: relative;
+  margin-bottom: 4px;
+}
+
+.conversation-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: white;
+  border: 1px solid transparent;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.conversation-link:hover {
+  background: #f8fafc;
+  border-color: #e5e7eb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.conversation-link-active {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
+}
+
+.conversation-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease;
+}
+
+.conversation-indicator-default {
+  background: #d1d5db;
+}
+
+.conversation-indicator-active {
+  background: #3b82f6;
+}
+
+.conversation-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.conversation-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #111827;
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.conversation-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.conversation-menu-btn {
+  opacity: 0;
+  padding: 6px;
+  background: none;
+  border: none;
+  color: #6b7280;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.conversation-link:hover .conversation-menu-btn {
+  opacity: 1;
+}
+
+.conversation-menu-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.conversation-dropdown {
+  position: absolute;
+  right: 8px;
+  top: 100%;
+  z-index: 20;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 4px 0;
+  min-width: 140px;
+  animation: slideIn 0.15s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.conversation-dropdown-item {
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 14px;
+  color: #374151;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.conversation-dropdown-item:hover {
+  background: #f9fafb;
+}
+
+.conversation-dropdown-item-danger {
+  color: #dc2626;
+}
+
+.conversation-dropdown-item-danger:hover {
+  background: #fef2f2;
+}
+
+.conversation-edit-input {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.conversation-edit-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.conversation-empty {
+  padding: 24px;
+  text-align: center;
+  color: #6b7280;
+}
+
+.conversation-empty-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 12px;
+  color: #d1d5db;
+}
+
+.conversation-empty-title {
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: #374151;
+}
+
+.conversation-empty-description {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.sidebar-control-btn {
+  padding: 8px;
+  background: none;
+  border: none;
+  color: #6b7280;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-control-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
 @media (max-width: 768px) {
   .nav-links {
     display: none;
