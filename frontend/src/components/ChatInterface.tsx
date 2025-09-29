@@ -118,28 +118,34 @@ export function ChatInterface({ isCompact = false }: ChatInterfaceProps = {}) {
             <div className="chat-suggestions">
               <button 
                 className="chat-suggestion-btn"
-                onClick={() => setComposerText('How do I validate a payout payload for Australia?')}
+                onClick={() => setComposerText('What are the mandatory fields for USD payouts to the US?')}
               >
-                💸 Validate payout payload for Australia
+                💸 Mandatory fields for USD payouts to the US
               </button>
               <button 
                 className="chat-suggestion-btn"
-                onClick={() => setComposerText('Show me API integration examples for USD transfers')}
+                onClick={() => setComposerText('What is the regexp for Sort code in GBP?')}
               >
-                🔗 API integration examples for USD
+                🔗 Regexp for Sort code in GBP
               </button>
               <button 
                 className="chat-suggestion-btn"
-                onClick={() => setComposerText('What are the required fields for Singapore payouts?')}
+                onClick={() => setComposerText('What are the proxy types supported in Malaysia?')}
               >
-                📋 Required fields for Singapore payouts
+                📋 Proxy types supported in Malaysia
+              </button>
+              <button 
+                className="chat-suggestion-btn"
+                onClick={() => setComposerText('Generate a payout object for GBP payouts?')}
+              >
+                🛠️ Generate payout object for GBP
               </button>
               {!isCompact && (
                 <button 
                   className="chat-suggestion-btn"
-                  onClick={() => setComposerText('Generate a cURL example for bank transfer to UK')}
+                  onClick={() => setComposerText('How do I authenticate with Nium API?')}
                 >
-                  🛠️ Generate cURL example for UK bank transfer
+                  🔐 Authenticate with Nium API
                 </button>
               )}
             </div>
