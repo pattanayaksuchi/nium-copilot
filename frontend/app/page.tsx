@@ -86,7 +86,7 @@ export default function DocsPage() {
                   }}
                 >
                   <MessageCircle size={16} />
-                  Developer Copilot
+                  Nium Copilot
                 </a>
               </div>
             </div>
@@ -136,7 +136,7 @@ export default function DocsPage() {
                 }}
               >
                 <MessageCircle size={20} />
-                Start Building
+                Nium Copilot
               </a>
               <a 
                 href="#api-reference"
