@@ -97,21 +97,31 @@ class ApiClient {
     const url = `${this.baseUrl}${endpoint}`;
     const clientId = getClientId();
 
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Client-Id': clientId,
-        ...options.headers,
-      },
-    });
+    console.log(`API Request: ${options.method || 'GET'} ${url}`);
+    
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Client-Id': clientId,
+          ...options.headers,
+        },
+      });
 
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`API Error: ${response.status} - ${error}`);
+      console.log(`API Response: ${response.status} ${response.statusText}`);
+
+      if (!response.ok) {
+        const error = await response.text();
+        console.error(`API Error: ${response.status} - ${error}`);
+        throw new Error(`API Error: ${response.status} - ${error}`);
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error('Network error:', error);
+      throw error;
     }
-
-    return response.json();
   }
 
   // Conversation management
