@@ -1126,7 +1126,7 @@ def answer_regex_query(query: str) -> Optional[Dict[str, Any]]:
             if currency_token in query_tokens:
                 corridor_bonus += 3
             score = overlap * 3 + complexity * 10 + corridor_bonus
-            matches.append((score, overlap, complexity, corridor, path, node, keyword_overlap))
+            matches.append((score, overlap, complexity, corridor, path, node))
 
     if not matches:
         return None
@@ -1136,7 +1136,15 @@ def answer_regex_query(query: str) -> Optional[Dict[str, Any]]:
     top_matches = [match for match in matches if match[3] == best_corridor]
 
     key_tokens = {"bsb", "sort", "ifsc", "swift", "iban"}
-    filtered = [match for match in top_matches if match[6] & key_tokens]
+    filtered = []
+    for match in top_matches:
+        _, _, _, corridor, path, node = match
+        # Check if any routing-related tokens are present
+        pattern_text = node.get("pattern", "").lower()
+        desc_text = node.get("description", "").lower()
+        combined_text = f"{pattern_text} {desc_text}"
+        if any(token in combined_text for token in key_tokens):
+            filtered.append(match)
     if filtered:
         top_matches = filtered
     top_matches = top_matches[:3]
@@ -1146,7 +1154,7 @@ def answer_regex_query(query: str) -> Optional[Dict[str, Any]]:
     def is_regex(text: str) -> bool:
         return any(ch in text for ch in "^[]{}()?*+|\\d$")
 
-    for _, _, _, corridor, path, node, _ in top_matches:
+    for _, _, _, corridor, path, node in top_matches:
         pattern = node.get("pattern", "")
         if not is_regex(pattern):
             continue
