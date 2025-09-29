@@ -37,7 +37,7 @@ export function ConversationSidebar() {
 
   const handleNewChat = async () => {
     try {
-      const newConversation = await createConversation.mutateAsync();
+      const newConversation = await createConversation.mutateAsync(undefined);
       setSelectedConversationId(newConversation.id);
       showToast({
         type: 'success',
