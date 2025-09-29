@@ -295,7 +295,12 @@ def _resolve_corridors(query: str) -> List[Corridor]:
 
     if not candidates:
         for corridor in _match_countries(query):
-            candidates.append((6, corridor))
+            # Give higher score to exact country name matches
+            country_score = 6
+            country_lower = corridor.country.lower()
+            if country_lower in normalized:
+                country_score += 10  # Boost exact country matches
+            candidates.append((country_score, corridor))
 
     candidates.sort(key=lambda item: item[0], reverse=True)
     return [corridor for score, corridor in candidates if score >= 0]
