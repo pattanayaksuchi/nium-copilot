@@ -802,14 +802,83 @@ def answer_required_fields_query(query: str) -> Optional[Dict[str, Any]]:
             
             field_list.append(f"• `{display_field}` - {enhanced_desc}")
         
-        # Add corridor-specific fields based on currency/country
-        if corridor.currency == "MYR" and corridor.country == "MALAYSIA":
+        # Add corridor-specific mandatory fields based on currency/country
+        if corridor.currency == "CAD" and corridor.country == "CANADA":
+            # Add Canadian-specific mandatory fields
+            if not any("institutionNumber" in item for item in field_list):
+                field_list.append("• `institutionNumber` - 3-digit bank institution number")
+            if not any("transitNumber" in item for item in field_list):
+                field_list.append("• `transitNumber` - 5-digit branch transit number")
+        elif corridor.currency == "BRL" and corridor.country == "BRAZIL":
+            # Add Brazilian-specific mandatory fields
+            if not any("branchCode" in item for item in field_list):
+                field_list.append("• `branchCode` - Bank branch code")
+            if not any("cpfOrCnpj" in item for item in field_list):
+                field_list.append("• `cpfOrCnpj` - CPF (11 digits) for individuals or CNPJ (14 digits) for businesses")
+        elif corridor.currency == "ZAR" and corridor.country == "SOUTH AFRICA":
+            # Add South African-specific mandatory fields
+            if not any("branchCode" in item for item in field_list):
+                field_list.append("• `branchCode` - Bank branch code")
+            if not any("nationalId" in item for item in field_list):
+                field_list.append("• `nationalIdIfRequired` - National ID if required by regulations")
+        elif corridor.currency == "THB" and corridor.country == "THAILAND":
+            # Add Thai-specific mandatory fields
+            if not any("bankCode" in item for item in field_list):
+                field_list.append("• `bankCode` - Thai bank code")
+        elif corridor.currency == "AED" and corridor.country == "UAE":
+            # Add UAE-specific mandatory fields
+            if not any("iban" in item for item in field_list):
+                field_list.append("• `iban` - International Bank Account Number")
+            if not any("purposeCode" in item for item in field_list):
+                field_list.append("• `purposeCode` - Remittance purpose code")
+        elif corridor.currency == "HKD" and corridor.country == "HONG KONG":
+            # Add Hong Kong-specific mandatory fields
+            if not any("bankCode" in item for item in field_list):
+                field_list.append("• `bankCode` - Hong Kong bank code")
+        elif corridor.currency == "CHF" and corridor.country == "SWITZERLAND":
+            # Add Swiss-specific mandatory fields
+            if not any("iban" in item for item in field_list):
+                field_list.append("• `iban` - International Bank Account Number")
+            if not any("bic" in item.lower() for item in field_list):
+                field_list.append("• `bicIfRequired` - Bank Identifier Code if required")
+        elif corridor.currency == "SEK" and corridor.country == "SWEDEN":
+            # Add Swedish-specific mandatory fields
+            if not any("iban" in item.lower() for item in field_list):
+                field_list.append("• `ibanOrClearingAccount` - IBAN or clearing account number")
+        elif corridor.currency == "AUD" and corridor.country == "AUSTRALIA":
+            # Add Australian-specific mandatory fields  
+            if not any("bsbCode" in item for item in field_list):
+                field_list.append("• `bsbCode` - 6-digit Bank State Branch code")
+            if not any("purposeCode" in item for item in field_list):
+                field_list.append("• `purposeCode` - Remittance purpose code")
+        elif corridor.currency == "MXN" and corridor.country == "MEXICO":
+            # Add Mexican-specific mandatory fields
+            if not any("clabe" in item.lower() for item in field_list):
+                field_list.append("• `clabe` - 18-digit CLABE number")
+            if not any("purposeCode" in item for item in field_list):
+                field_list.append("• `purposeCode` - Remittance purpose code")
+        elif corridor.currency == "MYR" and corridor.country == "MALAYSIA":
             field_list.append("• `nationalId` - NRIC or PASSPORT number for individual beneficiaries")
             field_list.append("• `businessId` - Registration number for business beneficiaries")
         elif corridor.currency == "KRW" and corridor.country == "SOUTH KOREA":
             field_list.append("• `beneficiaryNameLocal` - Beneficiary name in local language (Korean) if required")
-        elif corridor.currency == "JPY" and corridor.country == "JAPAN":
+        
+        # Add JPY specific fields
+        if corridor.currency == "JPY" and corridor.country == "JAPAN":
             field_list.append("• `beneficiaryNameKana` - Beneficiary name in kana script if required")
+        
+        # Ensure common mandatory fields are present
+        common_mandatory_fields = ["accountNumber", "beneficiaryName", "remitterName", "amount"]
+        for common_field in common_mandatory_fields:
+            if not any(common_field in item for item in field_list):
+                if common_field == "accountNumber":
+                    field_list.append("• `accountNumber` - Beneficiary bank account number")
+                elif common_field == "beneficiaryName":
+                    field_list.append("• `beneficiaryName` - Full name of the beneficiary")
+                elif common_field == "remitterName":
+                    field_list.append("• `remitterName` - Full name of the sender")
+                elif common_field == "amount":
+                    field_list.append("• `amount` - Transaction amount")
             
         # Add business vs individual sender requirements
         if "business" in normalized:

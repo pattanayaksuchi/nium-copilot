@@ -12,7 +12,7 @@ from .schemas import Conversation, Message
 class ConversationStore:
     """In-memory storage for conversations, organized by client ID."""
     
-    def __init__(self, max_conversations_per_client: int = 10):
+    def __init__(self, max_conversations_per_client: int = 100):
         self.max_conversations_per_client = max_conversations_per_client
         # Structure: {client_id: {conversation_id: Conversation}}
         self._conversations: Dict[str, Dict[str, Conversation]] = {}
