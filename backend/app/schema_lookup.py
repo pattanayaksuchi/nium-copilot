@@ -665,38 +665,112 @@ def answer_required_fields_query(query: str) -> Optional[Dict[str, Any]]:
         
         summary_parts.extend(field_list)
         
-        # Generate API-format example with actual currency
-        api_example = {
-            "method": method_name,
-            "channel": channel_name,
-            "currency": corridor.currency,
-            "country": corridor.country,
-            "details": {}
+        # Generate Transfer Money API format example
+        import json
+        
+        # Build the official Transfer Money API request structure
+        transfer_request = {
+            "beneficiaryDetail": {},
+            "payoutDetail": {
+                "payout_method": method_name.upper(),
+                "destination_currency": corridor.currency
+            },
+            "payout": {
+                "source_currency": "USD",  # Example source
+                "destination_amount": 1000.00,
+                "source_amount": 1000.00,
+                "audit_id": "[GET_FROM_FX_QUOTE]",
+                "serviceTime": "2024-01-15"
+            },
+            "deviceDetails": {
+                "countryIP": "45.48.241.198",
+                "deviceInfo": "Browser",
+                "ipAddress": "45.48.241.198",
+                "sessionId": "[GENERATE_SESSION_ID]"
+            },
+            "purposeCode": "[REQUIRED]",
+            "sourceOfFunds": "Business Operations",
+            "customerComments": "Transfer payment"
         }
         
+        # Map schema fields to proper API structure
         for field in required_fields:
             meta = props.get(field, {})
-            if "currency" in field.lower():
-                api_example["details"][field] = corridor.currency
-            elif "amount" in field.lower():
-                api_example["details"][field] = "1000.00"
-            elif "country" in field.lower():
-                api_example["details"][field] = corridor.country[:2] if corridor.country else "SG"
-            elif field in ["proxy_type", "proxyType"]:
-                # For proxy payments, show available types
-                proxy_types = _proxy_types_from_schema(corridor)
-                if proxy_types:
-                    api_example["details"][field] = proxy_types[0][1][0] if proxy_types[0][1] else "MOBILE"
-                else:
-                    api_example["details"][field] = "MOBILE"
-            else:
-                api_example["details"][field] = "[REQUIRED]"
+            
+            # Beneficiary fields
+            if "beneficiary" in field.lower():
+                if "name" in field.lower():
+                    transfer_request["beneficiaryDetail"]["name"] = "[REQUIRED]"
+                elif "country" in field.lower():
+                    country_code = corridor.country[:2] if len(corridor.country) >= 2 else "SG"
+                    transfer_request["beneficiaryDetail"]["country_code"] = country_code
+                elif "account" in field.lower() and "type" in field.lower():
+                    transfer_request["beneficiaryDetail"]["account_type"] = "Individual"
+                elif "account" in field.lower() and "number" in field.lower():
+                    transfer_request["payoutDetail"]["account_number"] = "[REQUIRED]"
+                elif "address" in field.lower():
+                    transfer_request["beneficiaryDetail"]["address"] = "[REQUIRED]"
+                elif "city" in field.lower():
+                    transfer_request["beneficiaryDetail"]["city"] = "[REQUIRED]"
+                elif "postcode" in field.lower():
+                    transfer_request["beneficiaryDetail"]["postcode"] = "[REQUIRED]"
+            
+            # Remitter fields - add to top level
+            elif "remitter" in field.lower():
+                if "name" in field.lower():
+                    transfer_request["remitterName"] = "[REQUIRED]"
+                elif "country" in field.lower():
+                    country_code = corridor.country[:2] if len(corridor.country) >= 2 else "SG" 
+                    transfer_request["remitterCountryCode"] = country_code
+                elif "account" in field.lower() and "type" in field.lower():
+                    transfer_request["remitterAccountType"] = "Company"
+                elif "address" in field.lower():
+                    transfer_request["remitterAddress"] = "[REQUIRED]"
+                elif "identification" in field.lower():
+                    if "type" in field.lower():
+                        transfer_request["remitterIdType"] = "[REQUIRED]"
+                    elif "number" in field.lower():
+                        transfer_request["remitterIdNumber"] = "[REQUIRED]"
+            
+            # Routing codes
+            elif "routing" in field.lower():
+                if "type" in field.lower():
+                    transfer_request["payoutDetail"]["routing_code_type_1"] = "SWIFT"
+                elif "value" in field.lower():
+                    transfer_request["payoutDetail"]["routing_code_value_1"] = "[REQUIRED]"
+            
+            # Proxy fields
+            elif "proxy" in field.lower():
+                if "type" in field.lower():
+                    proxy_types = _proxy_types_from_schema(corridor)
+                    proxy_type = proxy_types[0][1][0] if proxy_types and proxy_types[0][1] else "MOBILE"
+                    transfer_request["payoutDetail"]["proxy_type"] = proxy_type
+                elif "value" in field.lower():
+                    transfer_request["payoutDetail"]["proxy_value"] = "[REQUIRED]"
+            
+            # Transaction fields
+            elif "transaction" in field.lower() and "number" in field.lower():
+                transfer_request["externalId"] = "[REQUIRED]"
+            elif "purpose" in field.lower() and "code" in field.lower():
+                transfer_request["purposeCode"] = "[REQUIRED]"
+            elif "destination" in field.lower():
+                if "currency" in field.lower():
+                    transfer_request["payoutDetail"]["destination_currency"] = corridor.currency
+                elif "amount" in field.lower():
+                    transfer_request["payout"]["destination_amount"] = 1000.00
         
-        import json
-        example_json = json.dumps(api_example, indent=2)
+        # Clean up empty sections
+        if not transfer_request["beneficiaryDetail"]:
+            del transfer_request["beneficiaryDetail"]
         
-        summary_parts.append("\n**API Format Example:**")
-        summary_parts.append(f"```json\n{example_json}\n```")
+        example_json = json.dumps(transfer_request, indent=2)
+        
+        summary_parts.append("\n**Transfer Money API Request Format:**")
+        summary_parts.append(f"```json\nPOST /api/v1/client/{{clientHashId}}/customer/{{customerHashId}}/wallet/{{walletHashId}}/remittance\n\n{example_json}\n```")
+        summary_parts.append("\n**Prerequisites:**")
+        summary_parts.append("1. Get FX quote first: `GET /lockExchangeRate` to obtain `audit_id`")
+        summary_parts.append("2. Ensure customer and wallet are created and active")
+        summary_parts.append("3. Validate purpose code for the corridor")
         
         answer = "\n".join(summary_parts)
         citations = [
