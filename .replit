@@ -65,4 +65,4 @@ externalPort = 3000
 [deployment]
 deploymentTarget = "vm"
 build = ["bash", "-c", "python -m pip install -r backend/requirements.txt && cd frontend && npm install && NEXT_BUILD_MODE=production npm run build"]
-run = ["bash", "-c", "pkill -f 'python main_simple.py' || true; (cd backend && REPLIT_DEPLOYMENT=1 python main_simple.py) & for i in {1..60}; do curl -f http://127.0.0.1:8000/health >/dev/null 2>&1 && break; sleep 0.5; done; cd frontend && NEXT_BUILD_MODE=production PORT=5000 npm start"]
+run = ["bash", "-c", "(cd backend && python main_simple.py) & sleep 5 && cd frontend && NEXT_BUILD_MODE=production PORT=5000 npm start"]
