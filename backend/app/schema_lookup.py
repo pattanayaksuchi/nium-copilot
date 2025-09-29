@@ -478,11 +478,38 @@ def answer_proxy_query(query: str) -> Optional[Dict[str, Any]]:
         return None
 
     corridors = _resolve_corridors(query)
+    
+    # Filter to specific country if mentioned explicitly
+    country_mentioned = False
+    specific_corridors = []
+    tokens = _tokenize(normalized)
+    
+    for corridor in corridors:
+        aliases = _corridor_aliases(corridor)
+        country_lower = corridor.country.lower()
+        
+        # Check if this specific country is mentioned in the query
+        if (country_lower in normalized or 
+            aliases & tokens or 
+            any(alias in normalized for alias in aliases)):
+            
+            # Give priority to exact country name matches
+            if country_lower in normalized:
+                specific_corridors.insert(0, corridor)  # Put exact matches first
+                country_mentioned = True
+            else:
+                specific_corridors.append(corridor)
+                country_mentioned = True
+    
+    # If a specific country was mentioned, only return results for that country
+    # Otherwise, return all matching corridors (existing behavior)
+    target_corridors = specific_corridors[:1] if country_mentioned and specific_corridors else corridors
+    
     results: List[str] = []
     citations: List[Dict[str, str]] = []
     seen = set()
 
-    for corridor in corridors:
+    for corridor in target_corridors:
         entries = _proxy_types_from_schema(corridor)
         if not entries:
             continue
@@ -506,7 +533,13 @@ def answer_proxy_query(query: str) -> Optional[Dict[str, Any]]:
     if not results:
         return None
 
-    answer_lines = ["Here are the proxy types supported for the matching corridors:"]
+    # Update the header message based on whether it's country-specific
+    if country_mentioned and len(target_corridors) == 1:
+        corridor = target_corridors[0]
+        answer_lines = [f"Here are the proxy types supported for {corridor.country}:"]
+    else:
+        answer_lines = ["Here are the proxy types supported for the matching corridors:"]
+    
     answer_lines.extend(results)
     answer = "\n".join(answer_lines)
     return {"answer": answer, "citations": citations[:3]}
