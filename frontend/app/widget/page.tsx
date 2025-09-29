@@ -6,7 +6,7 @@ import { AppShell } from '../../src/components/AppShell';
 import { QueryProvider } from '../../src/components/QueryProvider';
 import { ToastProvider } from '../../src/components/Toast';
 import { useConversationStore } from '../../src/store/conversationStore';
-import { MessageCircle, Minimize2, Maximize2, X, Bot, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MessageCircle, Minimize2, Maximize2, X, Bot, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 export default function WidgetPage() {
@@ -152,54 +152,116 @@ export default function WidgetPage() {
           }}>
             {widgetState === 'maximized' ? (
               // Horizontal layout: sidebar on left, chat on right when maximized
-              <>
+              <div style={{ 
+                display: 'flex', 
+                width: '100%', 
+                height: '100%',
+                overflow: 'hidden'
+              }}>
+                {/* Sidebar Container */}
                 <div style={{
-                  width: sidebarCollapsed ? '48px' : '300px',
+                  width: sidebarCollapsed ? '56px' : '280px',
                   flexShrink: 0,
                   borderRight: '1px solid #e5e7eb',
                   background: '#f9fafb',
                   position: 'relative',
-                  transition: 'width 0.3s ease'
+                  transition: 'width 0.3s ease',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  overflow: 'hidden'
                 }}>
-                  <ConversationSidebar />
-                  {/* Collapse Toggle Button */}
-                  <button
-                    onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                    style={{
-                      position: 'absolute',
-                      right: '8px',
-                      top: '16px',
-                      padding: '4px',
-                      border: 'none',
-                      background: '#ffffff',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                      color: '#6b7280',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      zIndex: 10
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = '#f3f4f6';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = '#ffffff';
-                    }}
-                  >
-                    {sidebarCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
-                  </button>
+                  {/* Sidebar Header */}
+                  <div style={{
+                    padding: '16px 12px',
+                    borderBottom: '1px solid #e5e7eb',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                  }}>
+                    {!sidebarCollapsed && (
+                      <span style={{ 
+                        fontSize: '14px', 
+                        fontWeight: '600', 
+                        color: '#374151' 
+                      }}>
+                        Conversations
+                      </span>
+                    )}
+                    <button
+                      onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                      style={{
+                        padding: '4px',
+                        border: 'none',
+                        background: 'none',
+                        cursor: 'pointer',
+                        borderRadius: '4px',
+                        color: '#6b7280',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = '#f3f4f6';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'none';
+                      }}
+                    >
+                      {sidebarCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+                    </button>
+                  </div>
+
+                  {/* Sidebar Content */}
+                  <div style={{
+                    flex: 1,
+                    overflow: 'hidden',
+                    padding: sidebarCollapsed ? '8px' : '12px'
+                  }}>
+                    {!sidebarCollapsed ? (
+                      <ConversationSidebar />
+                    ) : (
+                      <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}>
+                        <button
+                          onClick={() => {
+                            // Create new chat functionality
+                          }}
+                          style={{
+                            width: '32px',
+                            height: '32px',
+                            border: 'none',
+                            background: '#2563eb',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            color: 'white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                          title="New Chat"
+                        >
+                          <Plus size={16} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
+
+                {/* Chat Container */}
                 <div style={{
                   flex: 1,
                   display: 'flex',
                   flexDirection: 'column',
-                  background: '#ffffff'
+                  background: '#ffffff',
+                  overflow: 'hidden'
                 }}>
                   <ChatInterface isCompact={false} />
                 </div>
-              </>
+              </div>
             ) : (
               // Clean chat interface only when compact
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: '#f8fafc' }}>
