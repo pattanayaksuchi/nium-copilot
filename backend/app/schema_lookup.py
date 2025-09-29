@@ -207,8 +207,10 @@ CREATE_PAYOUT_HINTS = {
 
 API_USAGE_HINTS = {
     "retrieve payout",
-    "get payout",
+    "get payout", 
     "list payouts",
+    "payout status",
+    "status",
     "authenticate",
     "authentication",
     "register webhook",
@@ -221,6 +223,10 @@ API_USAGE_HINTS = {
     "bearer token",
     "date range",
     "pagination",
+    "get",
+    "post",
+    "endpoint",
+    "api",
 }
 
 
