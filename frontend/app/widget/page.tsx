@@ -2,6 +2,8 @@
 
 import { ConversationSidebar } from '../../src/components/ConversationSidebar';
 import { ChatInterface } from '../../src/components/ChatInterface';
+import { useConversations, useCreateConversation } from '../../src/hooks/useConversations';
+import { useToast } from '../../src/components/Toast';
 import { AppShell } from '../../src/components/AppShell';
 import { QueryProvider } from '../../src/components/QueryProvider';
 import { ToastProvider } from '../../src/components/Toast';
@@ -9,9 +11,186 @@ import { useConversationStore } from '../../src/store/conversationStore';
 import { MessageCircle, Minimize2, Maximize2, X, Bot, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
+// Widget-optimized conversation list component
+function WidgetConversationList() {
+  const { data: conversations = [], isLoading } = useConversations();
+  const { selectedConversationId, setSelectedConversationId } = useConversationStore();
+  const createConversation = useCreateConversation();
+  const { showToast } = useToast();
+
+  const handleNewChat = async () => {
+    try {
+      const newConversation = await createConversation.mutateAsync(undefined);
+      setSelectedConversationId(newConversation.id);
+      showToast({
+        type: 'success',
+        title: 'New conversation created',
+        message: 'Ready to start chatting!'
+      });
+    } catch (error) {
+      console.error('Failed to create conversation:', error);
+      showToast({
+        type: 'error',
+        title: 'Failed to create conversation',
+        message: 'Please try again'
+      });
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString([], { 
+      month: 'short', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  return (
+    <div style={{ 
+      display: 'flex', 
+      flexDirection: 'column', 
+      height: '100%',
+      padding: '12px'
+    }}>
+      {/* Search Input */}
+      <input
+        type="text"
+        placeholder="Search conversations..."
+        style={{
+          width: '100%',
+          padding: '8px 12px',
+          border: '1px solid #e5e7eb',
+          borderRadius: '6px',
+          fontSize: '14px',
+          marginBottom: '12px',
+          outline: 'none'
+        }}
+      />
+
+      {/* New Chat Button */}
+      <button
+        onClick={handleNewChat}
+        disabled={createConversation.isPending || conversations.length >= 10}
+        style={{
+          width: '100%',
+          padding: '10px 16px',
+          backgroundColor: '#2563eb',
+          color: 'white',
+          border: 'none',
+          borderRadius: '6px',
+          fontSize: '14px',
+          fontWeight: '500',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '6px',
+          marginBottom: '16px'
+        }}
+      >
+        <Plus size={16} />
+        New Chat
+      </button>
+
+      {/* Conversations List */}
+      <div style={{
+        flex: 1,
+        overflow: 'auto'
+      }}>
+        {isLoading ? (
+          <div style={{ padding: '16px', textAlign: 'center', color: '#6b7280' }}>
+            Loading...
+          </div>
+        ) : conversations.length === 0 ? (
+          <div style={{
+            textAlign: 'center',
+            padding: '24px 16px',
+            color: '#6b7280'
+          }}>
+            <MessageCircle size={32} style={{ margin: '0 auto 12px', opacity: 0.5 }} />
+            <p style={{ margin: '0 0 8px', fontSize: '14px', fontWeight: '500' }}>
+              No conversations yet
+            </p>
+            <p style={{ margin: 0, fontSize: '12px' }}>
+              Start a new chat to get started
+            </p>
+          </div>
+        ) : (
+          <div>
+            {conversations.map((conversation) => (
+              <div
+                key={conversation.id}
+                onClick={() => setSelectedConversationId(conversation.id)}
+                style={{
+                  padding: '12px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  marginBottom: '4px',
+                  backgroundColor: selectedConversationId === conversation.id ? '#eff6ff' : 'transparent',
+                  borderLeft: selectedConversationId === conversation.id ? '3px solid #2563eb' : '3px solid transparent',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  if (selectedConversationId !== conversation.id) {
+                    e.currentTarget.style.backgroundColor = '#f3f4f6';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (selectedConversationId !== conversation.id) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }
+                }}
+              >
+                <div style={{
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#111827',
+                  marginBottom: '4px',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap'
+                }}>
+                  {conversation.title}
+                </div>
+                <div style={{
+                  fontSize: '12px',
+                  color: '#6b7280',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}>
+                  <span>{formatDate(conversation.updated_at)}</span>
+                  {conversation.messages_count > 0 && (
+                    <>
+                      <span>•</span>
+                      <span>{conversation.messages_count} messages</span>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function WidgetPage() {
   const [widgetState, setWidgetState] = useState<'minimized' | 'compact' | 'maximized'>('minimized');
-  const { sidebarCollapsed, setSidebarCollapsed } = useConversationStore();
+  const { sidebarCollapsed, setSidebarCollapsed, setSelectedConversationId } = useConversationStore();
+  const createConversation = useCreateConversation();
+
+  const handleNewChatCollapsed = async () => {
+    try {
+      const newConversation = await createConversation.mutateAsync(undefined);
+      setSelectedConversationId(newConversation.id);
+    } catch (error) {
+      console.error('Failed to create conversation:', error);
+    }
+  };
 
   useEffect(() => {
     // Notify parent about resize
@@ -215,21 +394,21 @@ export default function WidgetPage() {
                   <div style={{
                     flex: 1,
                     overflow: 'hidden',
-                    padding: sidebarCollapsed ? '8px' : '12px'
+                    display: 'flex',
+                    flexDirection: 'column'
                   }}>
                     {!sidebarCollapsed ? (
-                      <ConversationSidebar />
+                      <WidgetConversationList />
                     ) : (
                       <div style={{
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        gap: '8px'
+                        gap: '8px',
+                        padding: '8px'
                       }}>
                         <button
-                          onClick={() => {
-                            // Create new chat functionality
-                          }}
+                          onClick={handleNewChatCollapsed}
                           style={{
                             width: '32px',
                             height: '32px',
