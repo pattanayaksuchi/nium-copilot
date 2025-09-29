@@ -25,6 +25,13 @@ ALLOWED_ROOTS = [
     "https://docs.nium.com/",
     "https://playbook.nium.com"
 ]
+
+# URLs to exclude from scraping
+EXCLUDED_URLS = [
+    "https://docs.nium.com/docs/onboarding",
+    "https://playbook.nium.com/fund-and-collect?payin_service=Funding&channel=Nium+One"
+]
+
 MAX_DEPTH = 2
 USER_AGENT = "Nium-Developer-Copilot/0.1"
 
@@ -82,6 +89,15 @@ def to_markdown(html: str) -> Tuple[str, str]:
     return title, markdown
 
 
+def should_exclude_url(url: str) -> bool:
+    """Check if URL should be excluded from scraping."""
+    for excluded in EXCLUDED_URLS:
+        # Check for exact match or if URL starts with the excluded pattern
+        if url == excluded or url.startswith(excluded.split('?')[0]):
+            return True
+    return False
+
+
 def crawl(roots: Iterable[str], out_dir: Path) -> List[Dict[str, str]]:
     out_dir.mkdir(parents=True, exist_ok=True)
     metadata: List[Dict[str, str]] = []
@@ -95,6 +111,12 @@ def crawl(roots: Iterable[str], out_dir: Path) -> List[Dict[str, str]]:
         page = queue.popleft()
         if page.url in visited:
             continue
+        
+        # Skip excluded URLs
+        if should_exclude_url(page.url):
+            visited.add(page.url)  # Mark as visited to prevent re-queuing
+            continue
+            
         visited.add(page.url)
 
         try:
@@ -118,6 +140,9 @@ def crawl(roots: Iterable[str], out_dir: Path) -> List[Dict[str, str]]:
             if urlparse(link).netloc not in allowed_hosts:
                 continue
             if link in visited:
+                continue
+            # Skip excluded URLs when adding to queue
+            if should_exclude_url(link):
                 continue
             queue.append(Page(url=link, depth=page.depth + 1))
     return metadata
