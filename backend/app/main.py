@@ -2,16 +2,21 @@
 
 from __future__ import annotations
 
+import os
+from pathlib import Path
 from typing import Any, Dict, List
 
 from fastapi import FastAPI, HTTPException, Header, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 from . import rag, schema_lookup, schemas, settings, validator
 from .conversation_store import conversation_store
 
 app = FastAPI(title="Nium Developer Copilot", version="0.1.0")
 
+# Enhanced CORS for iframe widget support in production
 allow_origins = [settings.FRONTEND_ORIGIN]
 allow_all = settings.FRONTEND_ORIGIN == "*"
 app.add_middleware(
@@ -20,12 +25,19 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"]
 )
 
 
 @app.on_event("startup")
 def _startup() -> None:
     settings.ensure_directories()
+    
+    # Mount static files for production frontend serving
+    frontend_dist = Path(__file__).parent.parent.parent / "frontend" / "out"
+    if frontend_dist.exists():
+        app.mount("/_next", StaticFiles(directory=frontend_dist / "_next"), name="nextjs_static")
+        app.mount("/static", StaticFiles(directory=frontend_dist / "static" if (frontend_dist / "static").exists() else frontend_dist), name="static_files")
 
 
 def get_client_id(x_client_id: str = Header(None)) -> str:
@@ -313,6 +325,43 @@ Current question: {current_message}
 Please provide a comprehensive answer considering the conversation context."""
     
     return contextual_prompt
+
+
+# Serve frontend static files in production
+@app.get("/{full_path:path}", include_in_schema=False)
+def serve_frontend(full_path: str):
+    """Serve frontend files for production deployment."""
+    frontend_dist = Path(__file__).parent.parent.parent / "frontend" / "out"
+    
+    if not frontend_dist.exists():
+        raise HTTPException(status_code=404, detail="Frontend not built")
+    
+    # Handle Next.js routes
+    if full_path.startswith("_next/") or full_path.startswith("static/"):
+        file_path = frontend_dist / full_path
+        if file_path.exists() and file_path.is_file():
+            return FileResponse(file_path)
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    # Handle app routes (SPA routing)
+    routes = ["", "dev-copilot", "docs", "widget"]
+    
+    if full_path in routes or full_path == "":
+        index_file = frontend_dist / "index.html"
+        if index_file.exists():
+            return FileResponse(index_file, media_type="text/html")
+    
+    # Try to serve as static file
+    file_path = frontend_dist / full_path
+    if file_path.exists() and file_path.is_file():
+        return FileResponse(file_path)
+    
+    # Fallback to index.html for SPA routing
+    index_file = frontend_dist / "index.html"
+    if index_file.exists():
+        return FileResponse(index_file, media_type="text/html")
+    
+    raise HTTPException(status_code=404, detail="Not found")
 
 
 __all__ = ["app"]

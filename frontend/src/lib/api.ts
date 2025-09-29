@@ -4,10 +4,9 @@ import { v4 as uuidv4 } from 'uuid';
 // Configure API base URL for different environments
 const getApiBaseUrl = () => {
   if (typeof window !== 'undefined') {
-    // In Replit, backend is accessed through the same domain with different port
-    if (window.location.hostname.includes('replit.dev')) {
-      // Use the same origin but proxy to backend port 8000
-      return window.location.origin + '/api-proxy';
+    // In production, backend and frontend are served from the same origin
+    if (window.location.hostname.includes('replit.dev') || window.location.hostname.includes('replit.app')) {
+      return window.location.origin;
     }
     // For local development, use localhost with port 8000
     return 'http://localhost:8000';
