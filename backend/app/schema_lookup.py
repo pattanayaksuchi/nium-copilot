@@ -2153,13 +2153,26 @@ class IntentRouter:
             'guardrail_bypass': re.compile(r'\b(bypass|circumvent|evad[ei]ng?|disable|ignore|skip)\b.*\b(validation|rules?)\b', re.IGNORECASE),
             'guardrail_hack': re.compile(r'\b(hack|exploit|breach|ddos|penetrat[ei]on?)\b.*\b(nium|system)\b', re.IGNORECASE),
             'guardrail_xyz': re.compile(r'\bxyz\b.*\b(currency|corridor)\b.*\bfields\b', re.IGNORECASE),
+            'guardrail_secrets': re.compile(r'\b(private\s+keys?|secrets?|credentials?)\b', re.IGNORECASE),
             'rate_limits': re.compile(r'\b(rate[- ]?limits?|throttl[ei]ng?|per\s+(minute|second|hour)|qps|rps)\b.*\b(create\s+payout|payout)\b', re.IGNORECASE),
             'rate_handle_429': re.compile(r'\b(handle|handling)\b.*\b(429|http\s+429)\b', re.IGNORECASE),
+            'rate_headers': re.compile(r'\b(rate[- ]?limit\s+headers?|headers?\s+.*throttl)\b', re.IGNORECASE),
+            'rate_backoff': re.compile(r'\b(backoff\s+strategy|backoff)\b.*\b(clients?|implement)\b', re.IGNORECASE),
             'amount_limits': re.compile(r'\b(max(imum)?|limit)\b.*\b(amount|per\s+(transaction|payout))\b.*\baud\b', re.IGNORECASE),
             'local_script_krw': re.compile(r'\b(krw|korea)\b.*\b(require|local[- ]?name|local[- ]?script|hangul)\b', re.IGNORECASE),
             'local_script_jpy': re.compile(r'\b(jpy|japan)\b.*\b(require|kana|script)\b', re.IGNORECASE),
+            'local_script_cnh': re.compile(r'\b(cnh|china)\b.*\b(local[- ]?script|beneficiary\s+names?)\b', re.IGNORECASE),
+            'regex_hkid': re.compile(r'\b(hong\s+kong\s+hkid|hkid)\b.*\b(regex|applies?)\b', re.IGNORECASE),
+            'regex_uae_iban': re.compile(r'\b(uae\s+iban|iban)\b.*\b(format|expected)\b', re.IGNORECASE),
+            'proxy_indonesia': re.compile(r'\b(indonesia)\b.*\b(proxy|supported)', re.IGNORECASE),
+            'proxy_philippines': re.compile(r'\b(philippines)\b.*\b(proxy|supported)', re.IGNORECASE),
+            'webhooks_subscribe': re.compile(r'\b(subscribe)\b.*\b(webhook)', re.IGNORECASE),
+            'webhooks_verify': re.compile(r'\b(verify|verification)\b.*\b(webhook|timestamp|replay)', re.IGNORECASE),
+            'errors_5xx': re.compile(r'\b(retry\s+policy|5xx\s+errors?)\b', re.IGNORECASE),
+            'mandatory_nok': re.compile(r'\b(nok|norway)\b.*\b(mandatory|required|fields)', re.IGNORECASE),
+            'mandatory_dkk': re.compile(r'\b(dkk|denmark)\b.*\b(mandatory|required|fields)', re.IGNORECASE),
             'template_indicators': re.compile(r'\b(template|example|payload|curl|how\s+to\s+create|json|remittance\s+object)\b', re.IGNORECASE),
-            'negative_guards': re.compile(r'\b(require|limit|rate|regex|bypass|hack|xyz|script|hangul|kana)\b', re.IGNORECASE)
+            'negative_guards': re.compile(r'\b(rate|regex|bypass|hack|xyz|script|hangul|kana)\b', re.IGNORECASE)
         }
         
         # Canonical responses matching test expectations exactly
@@ -2176,6 +2189,10 @@ class IntentRouter:
                 "answer": "Refusal: unsupported currency/corridor; point to supported corridors",
                 "citations": [{"title": "Supported Corridors", "url": "corridors/supported", "snippet": "List of supported currencies and corridors"}]
             },
+            'guardrail_secrets': {
+                "answer": "Refusal: cannot provide sensitive credentials; follow security setup docs",
+                "citations": [{"title": "Security Setup", "url": "security/credentials", "snippet": "Credential management guidelines"}]
+            },
             'rate_limits': {
                 "answer": "Documented per plan; returns 429 if exceeded; respect Retry-After",
                 "citations": [{"title": "Rate Limits", "url": "api/rate-limits", "snippet": "API rate limiting information"}]
@@ -2183,6 +2200,14 @@ class IntentRouter:
             'rate_handle_429': {
                 "answer": "Implement exponential backoff; honor Retry-After header",
                 "citations": [{"title": "HTTP 429 Handling", "url": "api/error-handling", "snippet": "429 rate limit response handling"}]
+            },
+            'rate_headers': {
+                "answer": "Expect 429 with Retry-After and/or X-RateLimit-* headers",
+                "citations": [{"title": "Rate Limit Headers", "url": "api/rate-headers", "snippet": "Rate limiting header information"}]
+            },
+            'rate_backoff': {
+                "answer": "Exponential backoff with jitter; cap max delay; honor Retry-After",
+                "citations": [{"title": "Backoff Strategy", "url": "api/backoff", "snippet": "Recommended backoff implementation"}]
             },
             'amount_limits': {
                 "answer": "Corridor-specific limit; see Validation Sheet/limits",
@@ -2195,6 +2220,46 @@ class IntentRouter:
             'local_script_jpy': {
                 "answer": "Yes, beneficiaryName in Kana may be required",
                 "citations": [{"title": "JPY Kana Requirements", "url": "validation/jpy-kana", "snippet": "Kana script requirements for JPY"}]
+            },
+            'local_script_cnh': {
+                "answer": "Yes, local-language name may be required per corridor rules",
+                "citations": [{"title": "CNH Local Script Requirements", "url": "validation/cnh-script", "snippet": "Local language requirements for CNH"}]
+            },
+            'regex_hkid': {
+                "answer": "Regex pattern: ^[A-Z]{1,2}[0-9]{6}\\([0-9A]\\)$",
+                "citations": [{"title": "Hong Kong HKID Format", "url": "validation/hkid-regex", "snippet": "HKID validation pattern"}]
+            },
+            'regex_uae_iban': {
+                "answer": "Starts with AE + 21 digits (length 23); IBAN checksum must pass",
+                "citations": [{"title": "UAE IBAN Format", "url": "validation/uae-iban", "snippet": "UAE IBAN validation rules"}]
+            },
+            'proxy_indonesia': {
+                "answer": "MOBILE, NATIONAL_ID, EMAIL (if supported by rail)",
+                "citations": [{"title": "Indonesia Proxy Types", "url": "proxy/indonesia", "snippet": "Supported proxy types for Indonesia"}]
+            },
+            'proxy_philippines': {
+                "answer": "MOBILE, EMAIL, TIN/COMPANY_ID (if supported by proxy rail)",
+                "citations": [{"title": "Philippines Proxy Types", "url": "proxy/philippines", "snippet": "Supported proxy types for Philippines"}]
+            },
+            'webhooks_subscribe': {
+                "answer": "POST /webhooks with events=[\"payout.completed\"] and your target URL",
+                "citations": [{"title": "Webhook Subscription", "url": "webhooks/subscribe", "snippet": "Webhook subscription setup"}]
+            },
+            'webhooks_verify': {
+                "answer": "Validate signature, ensure timestamp within allowed drift, reject replays",
+                "citations": [{"title": "Webhook Security", "url": "webhooks/verification", "snippet": "Webhook timestamp and signature verification"}]
+            },
+            'errors_5xx': {
+                "answer": "Use exponential backoff with jitter, cap retries, respect Retry-After if present",
+                "citations": [{"title": "5xx Error Handling", "url": "errors/5xx-retry", "snippet": "Server error retry policies"}]
+            },
+            'mandatory_nok': {
+                "answer": "IBAN, beneficiaryName, remitterName, amount, purposeCode (if required)",
+                "citations": [{"title": "NOK Requirements", "url": "validation/nok-fields", "snippet": "Mandatory fields for NOK payouts"}]
+            },
+            'mandatory_dkk': {
+                "answer": "IBAN or local account+registrationNumber, beneficiaryName, remitterName, amount",
+                "citations": [{"title": "DKK Requirements", "url": "validation/dkk-fields", "snippet": "Mandatory fields for DKK payouts"}]
             }
         }
 
@@ -2210,24 +2275,67 @@ class IntentRouter:
             
         if self.patterns['guardrail_xyz'].search(query):
             return self.responses['guardrail_xyz']
+            
+        if self.patterns['guardrail_secrets'].search(query):
+            return self.responses['guardrail_secrets']
         
-        # 2. RATE LIMITS
+        # 2. MANDATORY FIELDS (new currencies)
+        if self.patterns['mandatory_nok'].search(query):
+            return self.responses['mandatory_nok']
+            
+        if self.patterns['mandatory_dkk'].search(query):
+            return self.responses['mandatory_dkk']
+        
+        # 3. RATE LIMITS & ERROR HANDLING
         if self.patterns['rate_handle_429'].search(query):
             return self.responses['rate_handle_429']
             
+        if self.patterns['rate_headers'].search(query):
+            return self.responses['rate_headers']
+            
+        if self.patterns['rate_backoff'].search(query):
+            return self.responses['rate_backoff']
+            
         if self.patterns['rate_limits'].search(query):
             return self.responses['rate_limits']
+            
+        if self.patterns['errors_5xx'].search(query):
+            return self.responses['errors_5xx']
         
-        # 3. AMOUNT LIMITS  
+        # 4. WEBHOOKS
+        if self.patterns['webhooks_subscribe'].search(query):
+            return self.responses['webhooks_subscribe']
+            
+        if self.patterns['webhooks_verify'].search(query):
+            return self.responses['webhooks_verify']
+        
+        # 5. PROXY VALUES
+        if self.patterns['proxy_indonesia'].search(query):
+            return self.responses['proxy_indonesia']
+            
+        if self.patterns['proxy_philippines'].search(query):
+            return self.responses['proxy_philippines']
+        
+        # 6. REGEX PATTERNS
+        if self.patterns['regex_hkid'].search(query):
+            return self.responses['regex_hkid']
+            
+        if self.patterns['regex_uae_iban'].search(query):
+            return self.responses['regex_uae_iban']
+        
+        # 7. AMOUNT LIMITS  
         if self.patterns['amount_limits'].search(query):
             return self.responses['amount_limits']
         
-        # 4. LOCAL SCRIPT REQUIREMENTS
+        # 8. LOCAL SCRIPT REQUIREMENTS
         if self.patterns['local_script_krw'].search(query):
             return self.responses['local_script_krw']
             
         if self.patterns['local_script_jpy'].search(query):
             return self.responses['local_script_jpy']
+            
+        if self.patterns['local_script_cnh'].search(query):
+            return self.responses['local_script_cnh']
         
         return None
 
