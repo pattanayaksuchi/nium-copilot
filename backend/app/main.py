@@ -97,8 +97,12 @@ def search(payload: schemas.SearchReq) -> Dict[str, Any]:
 
 @app.post("/chat", response_model=schemas.ChatResp)
 def chat(payload: schemas.ChatReq) -> schemas.ChatResp:
+    # Use IntentRouter for priority routing
     schema_answer = (
-        schema_lookup.answer_create_payout_query(payload.message)
+        schema_lookup.intent_router.route(payload.message)
+        or schema_lookup.answer_security_query(payload.message)
+        or schema_lookup.answer_address_requirements_query(payload.message)
+        or schema_lookup.answer_create_payout_query(payload.message)
         or schema_lookup.answer_api_usage_query(payload.message)
         or schema_lookup.answer_json_validation_query(payload.message)
         or schema_lookup.answer_validation_query(payload.message)
