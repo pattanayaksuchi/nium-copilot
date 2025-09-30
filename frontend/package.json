@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "NEXT_BUILD_MODE=development next dev -p 3000",
-    "build": "NEXT_BUILD_MODE=production next build",
+    "dev": "next dev -p 3000",
+    "build": "next build",
     "start": "next start -p 5000",
     "lint": "next lint"
   },

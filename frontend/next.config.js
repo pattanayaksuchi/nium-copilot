@@ -7,14 +7,6 @@ const nextConfig = {
   },
   experimental: {
     typedRoutes: true,
-  },
-  distDir: process.env.NEXT_BUILD_MODE === 'production' ? '.next' : '.next-dev',
-  webpack: (config, { dev }) => {
-    config.cache = {
-      type: 'filesystem',
-      name: dev ? 'dev' : 'prod'
-    };
-    return config;
   }
 };
 
