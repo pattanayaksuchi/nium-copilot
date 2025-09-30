@@ -10,6 +10,7 @@ const FRONTEND_PORT = 5000;
 const BACKEND_READY_TIMEOUT = 60000;
 
 let backendProcess = null;
+let frontendServer = null;
 
 async function waitForBackend() {
   const startTime = Date.now();
@@ -55,18 +56,32 @@ async function startBackend() {
 async function startFrontend() {
   console.log('Starting Next.js frontend...');
   process.env.BACKEND_URL = `http://127.0.0.1:${BACKEND_PORT}`;
-  
-  const app = next({ 
-    dev: false, 
+
+  const app = next({
+    dev: false,
     dir: './frontend'
   });
-  
+
   await app.prepare();
-  
-  const server = http.createServer(app.getRequestHandler());
-  
-  server.listen(FRONTEND_PORT, '0.0.0.0', () => {
-    console.log(`✓ Frontend ready on http://0.0.0.0:${FRONTEND_PORT}`);
+
+  frontendServer = http.createServer(app.getRequestHandler());
+
+  await new Promise((resolve, reject) => {
+    const handleError = (error) => {
+      if (frontendServer) {
+        frontendServer.off('error', handleError);
+      }
+      reject(error);
+    };
+
+    frontendServer.once('error', handleError);
+    frontendServer.listen(FRONTEND_PORT, '0.0.0.0', () => {
+      if (frontendServer) {
+        frontendServer.off('error', handleError);
+      }
+      console.log(`✓ Frontend ready on http://0.0.0.0:${FRONTEND_PORT}`);
+      resolve();
+    });
   });
 }
 
@@ -74,6 +89,12 @@ function handleShutdown(signal) {
   console.log(`Received ${signal}, shutting down gracefully...`);
   if (backendProcess) {
     backendProcess.kill();
+  }
+  if (frontendServer) {
+    const serverToClose = frontendServer;
+    frontendServer = null;
+    serverToClose.close(() => process.exit(0));
+    return;
   }
   process.exit(0);
 }
@@ -84,12 +105,19 @@ process.on('SIGQUIT', () => handleShutdown('SIGQUIT'));
 
 async function main() {
   try {
-    await startBackend();
+    const backendReady = startBackend();
     await startFrontend();
+    await backendReady;
   } catch (error) {
     console.error('Failed to start services:', error);
     if (backendProcess) {
       backendProcess.kill();
+    }
+    if (frontendServer) {
+      const serverToClose = frontendServer;
+      frontendServer = null;
+      serverToClose.close(() => process.exit(1));
+      return;
     }
     process.exit(1);
   }
