@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Force Node.js runtime to allow TCP connections to backend in production
+export const runtime = 'nodejs';
+
 // Use 127.0.0.1 for better production compatibility
 const BACKEND_URL = 'http://127.0.0.1:8000';
 
