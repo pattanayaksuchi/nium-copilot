@@ -60,5 +60,5 @@ externalPort = 8000
 
 [deployment]
 deploymentTarget = "vm"
-build = ["bash", "-c", "python -m pip install -r backend/requirements.txt && cd frontend && npm install && npm run build"]
+build = ["bash", "-c", "npm install && python -m pip install -r backend/requirements.txt && cd frontend && npm install && npm run build"]
 run = ["node", "server.js"]
