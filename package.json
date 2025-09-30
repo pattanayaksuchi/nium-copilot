@@ -4,8 +4,8 @@
   "description": "Nium Developer Copilot is an internal assistant that helps integration teams ship payouts faster across corridors. The repo bundles the FastAPI backend and the Next.js frontend that power the experience.",
   "main": "index.js",
   "scripts": {
-    "build": "cd frontend && npm install && npm run build",
-    "start": "cd frontend && npm start",
+    "build": "python -m pip install -r backend/requirements.txt && cd frontend && npm install && npm run build",
+    "start": "node server.js",
     "dev": "concurrently \"cd backend && python main_simple.py\" \"cd frontend && npm run dev -- --port 5000\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
