@@ -26,25 +26,25 @@ args = "Frontend"
 name = "Backend"
 author = "agent"
 
-[workflows.workflow.metadata]
-outputType = "console"
-
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd backend && python main_simple.py"
 waitForPort = 8000
 
+[workflows.workflow.metadata]
+outputType = "console"
+
 [[workflows.workflow]]
 name = "Frontend"
 author = "agent"
-
-[workflows.workflow.metadata]
-outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd frontend && npm run dev -- -p 5000"
 waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
 
 [[ports]]
 localPort = 3000
@@ -58,19 +58,7 @@ externalPort = 80
 localPort = 8000
 externalPort = 8000
 
-[[ports]]
-localPort = 39373
-externalPort = 3003
-
-[[ports]]
-localPort = 41327
-externalPort = 3000
-
-[[ports]]
-localPort = 45249
-externalPort = 3002
-
 [deployment]
 deploymentTarget = "vm"
 build = ["bash", "-c", "python -m pip install -r backend/requirements.txt && cd frontend && npm install && npm run build"]
-run = ["bash", "-c", "cd frontend && BACKEND_URL=http://127.0.0.1:8000 npx concurrently \"cd ../backend && python main_simple.py\" \"sleep 3 && npm start\""]
+run = ["bash", "start-production.sh"]
