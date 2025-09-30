@@ -58,7 +58,11 @@ externalPort = 80
 localPort = 8000
 externalPort = 8000
 
+[[ports]]
+localPort = 42569
+externalPort = 3000
+
 [deployment]
 deploymentTarget = "vm"
 build = ["bash", "-c", "python -m pip install -r backend/requirements.txt && cd frontend && npm install && npm run build"]
-run = ["bash", "start-production.sh"]
+run = ["node", "server.js"]

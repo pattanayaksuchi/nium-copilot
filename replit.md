@@ -24,6 +24,13 @@ Preferred communication style: Simple, everyday language.
 - **Component Structure**: React-based UI with TypeScript support and responsive design
 - **Authentication**: API key-based authentication without customer data handling
 
+**Production Deployment Architecture (September 2024)**
+- **Process Supervision**: Node.js supervisor (server.js) manages both backend and frontend processes
+- **Backend Service**: FastAPI runs on port 8000 (localhost only, not exposed)
+- **Frontend Service**: Next.js production server runs on port 5000 (public facing)
+- **API Proxy Pattern**: Next.js API routes proxy requests to backend at http://127.0.0.1:8000
+- **Health Management**: Supervisor ensures backend readiness before starting frontend; exits on backend failure for auto-restart
+
 **Data Processing Pipeline**
 - **Document Crawling**: BeautifulSoup-based web scraping of approved documentation sources
 - **Text Processing**: Markdown conversion with readability extraction and chunking strategies
