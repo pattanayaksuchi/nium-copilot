@@ -3,6 +3,11 @@ import { v4 as uuidv4 } from 'uuid';
 
 // Configure API base URL for different environments
 const getApiBaseUrl = () => {
+  // Check for explicit override first (useful for testing)
+  if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_BACKEND_URL) {
+    return process.env.NEXT_PUBLIC_BACKEND_URL;
+  }
+
   if (typeof window !== 'undefined') {
     // In Replit development environment, use proxy through frontend
     if (window.location.hostname.includes('replit.dev')) {
@@ -14,6 +19,11 @@ const getApiBaseUrl = () => {
     }
     // For local development, use localhost with port 8000
     return 'http://localhost:8000';
+  }
+  
+  // Server-side fallback: use /api in production environments
+  if (typeof process !== 'undefined' && process.env.REPLIT_DEPLOYMENT) {
+    return '/api';
   }
   return 'http://localhost:8000';
 };
