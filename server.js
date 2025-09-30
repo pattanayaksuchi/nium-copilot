@@ -84,8 +84,9 @@ process.on('SIGQUIT', () => handleShutdown('SIGQUIT'));
 
 async function main() {
   try {
-    await startBackend();
+    const backendReady = startBackend();
     await startFrontend();
+    await backendReady;
   } catch (error) {
     console.error('Failed to start services:', error);
     if (backendProcess) {
