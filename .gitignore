@@ -3,6 +3,7 @@ backend/build/
 frontend/.next/
 frontend/.next-dev/
 frontend/node_modules/
+node_modules/
 .env
 backend/.env
 frontend/.env.local

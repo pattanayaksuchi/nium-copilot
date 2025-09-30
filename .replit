@@ -60,5 +60,11 @@ externalPort = 8000
 
 [deployment]
 deploymentTarget = "vm"
+# Build both the backend and the Next.js production bundle. The root
+# `npm run build` script installs dependencies and emits `frontend/.next`
+# so the supervisor can serve the compiled frontend without rebuilding at
+# runtime.
 build = ["npm", "run", "build"]
+# Keep the supervisor entrypoint so it can reuse the freshly built
+# frontend bundle while managing both services.
 run = ["npm", "start"]

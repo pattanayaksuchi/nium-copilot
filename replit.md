@@ -84,6 +84,14 @@ Preferred communication style: Simple, everyday language.
 - Poetry/pip for Python dependency management
 - Node.js package management with npm
 
+## Deployment Notes
+
+- **Build Command**: `npm run build`
+  - Installs backend and frontend dependencies and produces the `frontend/.next` production bundle that the supervisor reuses during startup.
+- **Start Command**: `npm start`
+  - Runs `node server.js`, launching the supervisor so both backend and frontend processes reuse the freshly built assets.
+- After updating the deployment settings, redeploy to verify the public URL no longer displays the “Internal Server Error” banner and that the chat workflow completes successfully.
+
 **Data Storage**
 - File-based storage for documentation corpus and metadata
 - Pickle serialization for search indexes and embeddings
