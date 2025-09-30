@@ -8,9 +8,9 @@ const getApiBaseUrl = () => {
     if (window.location.hostname.includes('replit.dev')) {
       return `${window.location.origin}/api`;
     }
-    // In production (replit.app), backend and frontend are served from the same origin
+    // In production (replit.app), use Next.js API proxy
     if (window.location.hostname.includes('replit.app')) {
-      return window.location.origin;
+      return `${window.location.origin}/api`;
     }
     // For local development, use localhost with port 8000
     return 'http://localhost:8000';
