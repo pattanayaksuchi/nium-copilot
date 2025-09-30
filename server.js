@@ -1,5 +1,8 @@
 const { spawn } = require('child_process');
 const http = require('http');
+const path = require('path');
+
+module.paths.unshift(path.resolve(__dirname, 'frontend/node_modules'));
 const next = require('next');
 
 const BACKEND_PORT = 8000;
