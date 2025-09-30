@@ -69,4 +69,4 @@ externalPort = 3002
 [deployment]
 deploymentTarget = "vm"
 build = ["bash", "-c", "python -m pip install -r backend/requirements.txt && cd frontend && npm install && npm run build"]
-run = ["bash", "-c", "(cd backend && python main_simple.py) & sleep 5 && cd frontend && npm start"]
+run = ["bash", "-c", "cd frontend && BACKEND_URL=http://127.0.0.1:8000 npx concurrently \"cd ../backend && python main_simple.py\" \"sleep 3 && npm start\""]
